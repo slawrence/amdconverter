@@ -1,0 +1,28 @@
+<html>
+<head>
+<title>AMD Converter</title>
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="./converter.js"></script>
+<meta charset=utf-8 />
+ 
+</head>
+ 
+<body>
+<h2>Converted Output:</h2>
+<textarea id="output" rows="30" cols="100"></textarea>
+
+<script>
+    $.ajax({
+        url: './test1.js',
+        type: 'GET',
+        dataType: 'text', //don't execute
+        success: function (data) {
+            var output = CONVERTER.convert(data);
+            $('#output').text(output);
+            console.log(CONVERTER.dependencies);
+        }
+    });
+</script>
+
+</body>
+</html>
