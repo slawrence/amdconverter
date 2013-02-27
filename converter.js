@@ -285,11 +285,11 @@ var CONVERTER = (function () {
 
         str += "define([" + (cnt ? "\n" : "");
         for (i = 0; i < cnt; i += 1) {
-            str += tab + "\"" + array[i].depend + "\"\n";
+            str += tab + "\"" + array[i].depend + "\"" + (i !== cnt - 1 ? ",\n" : "\n");
         }
         str += "], function (" + (cnt ? "\n" : "");
         for (i = 0; i < cnt; i += 1) {
-            str += tab + array[i].alias.split('.')[0] + "\n";
+            str += tab + array[i].alias.split('.')[0] + (i !== cnt - 1 ? ",\n" : "\n");
         }
         str += ") {\n";
         return str;
