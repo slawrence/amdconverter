@@ -144,9 +144,6 @@ var CONVERTER = (function (global) {
                         this.alias = upperFirstChar(rest);
                     }
                 }
-            },
-            {
-                pattern: /PTO
             }
         ];
 
