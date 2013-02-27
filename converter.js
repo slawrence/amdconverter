@@ -142,6 +142,14 @@ var CONVERTER = (function () {
                 depend: 'dijit/registry',
             },
             {
+                pattern: /dijit\.([\w\.]*([A-Z]+[\w]*))/g,
+                repFn: function (all, rest, className) {
+                    //this matches returns bets guess at dijit dependency
+                    this.alias = "dijit" + className;
+                    this.depend = all.replace(/\./g, "/");
+                }
+            },
+            {
                 pattern: /PTO\.([\w\.]+)/g,
                 repFn: function (all, rest) {
                     var pieces = rest.split('.'),
