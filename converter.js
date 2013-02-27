@@ -1,4 +1,5 @@
 var CONVERTER = (function () {
+    'use strict';
     var dependencies = {},
         warnings = [],
         currentPath,
@@ -13,8 +14,9 @@ var CONVERTER = (function () {
             'PTO.log': true
         },
         shouldIgnore = function (string) {
-            for (var prop in ignore) {
-                if (string.indexOf(prop) === 0) {
+            var prop;
+            for (prop in ignore) {
+                if (ignore.hasOwnProperty(prop) && string.indexOf(prop) === 0) {
                     return ignore[prop];
                 }
             }
@@ -25,6 +27,20 @@ var CONVERTER = (function () {
             }
         },
         upperFirstChar = function (string) { return string.charAt(0).toUpperCase() + string.slice(1); },
+        relative = function (source, target) {
+            source = source.split("/");
+            target = target.split("/");
+            source.pop();
+            while (0 !== source.length && 0 !== target.length && target[0] === source[0]) {
+                source.shift();
+                target.shift();
+            }
+            while (0 !== source.length) {
+                source.shift();
+                target.unshift('..');
+            }
+            return target.join("/");
+        },
         dependNameMap = {
             'dojo/dom-class': 'domClass',
             'dojo/dom-attr': 'domAttr',
@@ -44,23 +60,23 @@ var CONVERTER = (function () {
         replacements = [
             {
                 pattern: /dojo\.(addClass[\w\.]*)/g,
-                depend: 'dojo/dom-class',
+                depend: 'dojo/dom-class'
             },
             {
                 pattern: /dojo\.(attr[\w\.]*)/g,
-                depend: 'dojo/dom-attr',
+                depend: 'dojo/dom-attr'
             },
             {
                 pattern: /dojo\.(byId[\w\.]*)/g,
-                depend: 'dojo/dom',
+                depend: 'dojo/dom'
             },
             {
                 pattern: /dojo\.(connect[\w\.]*)/g,
-                depend: 'dojo/_base/connect',
+                depend: 'dojo/_base/connect'
             },
             {
                 pattern: /dojo\.(create[\w\.]*)/g,
-                depend: 'dojo/dom-construct',
+                depend: 'dojo/dom-construct'
             },
             {
                 pattern: /dojo\.(declare[\w\.]*)/g,
@@ -74,79 +90,79 @@ var CONVERTER = (function () {
             },
             {
                 pattern: /dojo\.(destroy[\w\.]*)/g,
-                depend: 'dojo/dom-construct',
+                depend: 'dojo/dom-construct'
             },
             {
                 pattern: /dojo\.(disconnect[\w\.]*)/g,
-                depend: 'dojo/_base/connect',
+                depend: 'dojo/_base/connect'
             },
             {
                 pattern: /dojo\.(empty[\w\.]*)/g,
-                depend: 'dojo/dom-construct',
+                depend: 'dojo/dom-construct'
             },
             {
                 pattern: /dojo\.(forEach[\w\.]*)/g,
-                depend: 'dojo/_base/array',
+                depend: 'dojo/_base/array'
             },
             {
                 pattern: /dojo\.(hasClass[\w\.]*)/g,
-                depend: 'dojo/dom-class',
+                depend: 'dojo/dom-class'
             },
             {
                 pattern: /dojo\.(hitch[\w\.]*)/g,
-                depend: 'dojo/_base/lang',
+                depend: 'dojo/_base/lang'
             },
             {
                 pattern: /dojo\.(keys[\w\.]*)/g,
-                depend: 'dojo/keys',
+                depend: 'dojo/keys'
             },
             {
                 pattern: /dojo\.(map[\w\.]*)/g,
-                depend: 'dojo/_base/array',
+                depend: 'dojo/_base/array'
             },
             {
                 pattern: /dojo\.(mixin[\w\.]*)/g,
-                depend: 'dojo/_base/lang',
+                depend: 'dojo/_base/lang'
             },
             {
                 pattern: /dojo\.(place[\w\.]*)/g,
-                depend: 'dojo/dom-construct',
+                depend: 'dojo/dom-construct'
             },
             {
                 pattern: /dojo\.(query[\w\.]*)/g,
-                depend: 'dojo/query',
+                depend: 'dojo/query'
             },
             {
                 pattern: /dojo\.(removeClass[\w\.]*)/g,
-                depend: 'dojo/dom-class',
+                depend: 'dojo/dom-class'
             },
             {
                 pattern: /dojo\.(replaceClass[\w\.]*)/g,
-                depend: 'dojo/dom-class',
+                depend: 'dojo/dom-class'
             },
             {
                 pattern: /dojo\.(some[\w\.]*)/g,
-                depend: 'dojo/_base/array',
+                depend: 'dojo/_base/array'
             },
             {
                 pattern: /dojo\.(stopEvent[\w\.]*)/g,
-                depend: 'dojo/_base/event',
+                depend: 'dojo/_base/event'
             },
             {
                 pattern: /dojo\.(style[\w\.]*)/g,
-                depend: 'dojo/dom-style',
+                depend: 'dojo/dom-style'
             },
             {
                 pattern: /dojo\.(toggleClass[\w\.]*)/g,
-                depend: 'dojo/dom-class',
+                depend: 'dojo/dom-class'
             },
             {
                 pattern: /dojo\.(window[\w\.]*)/g,
-                depend: 'dojo/_base/window',
+                depend: 'dojo/_base/window'
             },
             {
                 pattern: /dijit\.(byId[\w\.]*)/g,
-                depend: 'dijit/registry',
+                depend: 'dijit/registry'
             },
             {
                 pattern: /dijit\.([\w\.]+)/g,
@@ -192,26 +208,6 @@ var CONVERTER = (function () {
             }
         ];
 
-    function relative(source, target) {
-        source = source.split("/");
-        target = target.split("/");
-        source.pop()
-        while (
-          0 !== source.length &&
-          0 !== target.length &&
-          target[0] === source[0]
-        ) {
-          source.shift()
-          target.shift()
-        }
-        while (0 !== source.length) {
-          source.shift()
-          target.unshift('..')
-        }
-        return target.join("/")
-      };
-
-
     /**
      * Loops through replacements array. If the pattern is found the following steps are executed:
      * 1. return all (do no replacement) if should be ignored
@@ -219,7 +215,8 @@ var CONVERTER = (function () {
      * 3. assign dependency with alias to dependencies map
      */
     function replaceOldDojo(string) {
-        var i, replacement;
+        var i,
+            replacement;
 
         //do replacements of globals based on pattern/fn
         for (i = 0; i < replacements.length; i += 1) {
@@ -268,26 +265,12 @@ var CONVERTER = (function () {
 
         //replace requires, add dependency
         string = string.replace(requirePattern, function (all, ns) {
+            //TODO: Schemas have to be added to dependencies here?
             //addDependency(ns); //this shouldn't be necessary
             return "";
         });
 
         return string;
-    }
-
-    /**
-     * Surround declare with define function. At this point we should have a populated dependency map.
-     * NOTE: We can only convert files that have one declare statement!
-     */
-    function convertDeclare(string) {
-        var declarePattern = /dojo\.declare\((?:'|")([\w\.]+)(?:'|"),\s*(null|[\w\.]+|\[[\w\.\s,]*\])[\S\s]*\}\);/g;
-        return string.replace(declarePattern, function (all, className, parents) {
-            //remove class name, it's not necessary.
-            all = all.replace(/(?:'|")([\w\.]*)(:?'|"),\s*/, "");
-            //surround with define
-            all = defineString(dependencies) + "var model = " + all + "\nreturn model;\n});";
-            return all;
-        });
     }
 
     /*
@@ -299,19 +282,26 @@ var CONVERTER = (function () {
             tab = "    ",
             array = [],
             i,
+            prop,
             cnt = 0;
 
         //let's make an array for sorting purposes
-        for (var prop in dependObject) {
-            array.push({
-                alias: dependObject[prop],
-                depend: prop
-            });
+        for (prop in dependObject) {
+            if (dependObject.hasOwnProperty(prop)) {
+                array.push({
+                    alias: dependObject[prop],
+                    depend: prop
+                });
+            }
         }
         cnt = array.length;
         array.sort(function (a, b) {
-            if (a.depend < b.depend) return -1;
-            if (a.depend > b.depend) return 1;
+            if (a.depend < b.depend) {
+                return -1;
+            }
+            if (a.depend > b.depend) {
+                return 1;
+            }
             return 0;
         });
 
@@ -325,6 +315,20 @@ var CONVERTER = (function () {
         }
         str += ") {\n";
         return str;
+    }
+    /**
+     * Surround declare with define function. At this point we should have a populated dependency map.
+     * NOTE: We can only convert files that have one declare statement!
+     */
+    function convertDeclare(string) {
+        var declarePattern = /dojo\.declare\((?:'|")([\w\.]+)(?:'|"),\s*(null|[\w\.]+|\[[\w\.\s,]*\])[\S\s]*\}\);/g;
+        return string.replace(declarePattern, function (all, className, parents) {
+            //remove class name, it's not necessary.
+            all = all.replace(/(?:'|")([\w\.]*)(:?'|"),\s*/, "");
+            //surround with define
+            all = defineString(dependencies) + "var model = " + all + "\nreturn model;\n});";
+            return all;
+        });
     }
 
     return {
