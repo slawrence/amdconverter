@@ -12,6 +12,8 @@
 <div><a id="convert" href="#">Convert</a></div>
 <h2>Converted Output:</h2>
 <textarea id="output" rows="30" cols="100"></textarea>
+<h3>Warnings:</h3>
+<ul id="warnings"></ul>
 
 <script>
     $.ajax({
@@ -26,6 +28,9 @@
             $('#convert').on('click', function () {
                 $('#output').text(CONVERTER.convert($('#input').val()));
             })
+            $.each(CONVERTER.warnings, function(index, warning) {
+                $('#warnings').append($('<li/>').text(warning));
+            });
         }
     });
 </script>

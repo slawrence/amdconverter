@@ -1,8 +1,15 @@
 var CONVERTER = (function () {
     var dependencies = {},
+        warnings = [],
+        currentPath,
+        warn = function (message) {
+            console.log(message);
+            warnings.push(message);
+        },
         ignore = {
             'PTO.app': true,
             'PTO.config': true,
+            'PTO.isUndefined': true,
             'PTO.log': true
         },
         shouldIgnore = function (string) {
@@ -144,7 +151,7 @@ var CONVERTER = (function () {
             {
                 pattern: /dijit\.([\w\.]+)/g,
                 repFn: function (all, rest) {
-                    //this matches returns bets guess at dijit dependency
+                    //this matches returns best guess at dijit dependency
                     var pieces = rest.split("."),
                         last = pieces[pieces.length - 1];
                     this.alias = "dijit" + last;
@@ -156,29 +163,53 @@ var CONVERTER = (function () {
                 repFn: function (all, rest) {
                     var pieces = rest.split('.'),
                         last = pieces[pieces.length - 1],
-                        toPath = function (string) {
-                            return string.replace(/^PTO\./, "").replace(/\./g, "/");
+                        toRelativePath = function (string) {
+                            string = relative(currentPath.replace(/\./g, "/"), string.replace(/\./g, "/"));
+                            if (string.indexOf(".") !== 0) {
+                                string = "./" + string;
+                            }
+                            return string;
                         };
                     //We can make assumptions here (I hope), if the last piece is capitalized it's a constructor
                     if (last.charAt(0).match(/[A-Z]/)) {
                         this.alias = last;
-                        this.depend = toPath(all);
+                        this.depend = toRelativePath(all);
                     } else {
                         //it's a method
                         if (pieces.length > 1) {
                             //piece before last is alias
                             this.alias = pieces[pieces.length - 2] + "." + last;
                             //don't include method in dependency
-                            this.depend = toPath(all.replace(/\.[\w]+$/, ""));
+                            this.depend = toRelativePath(all.replace(/\.[\w]+$/, ""));
                         } else {
                             //not sure what to do here, e.g. PTO
+                            warn('A method off PTO was found: ' + all);
                             this.alias = all;
-                            this.depend = toPath(all);
+                            this.depend = toRelativePath(all);
                         }
                     }
                 }
             }
         ];
+
+    function relative(source, target) {
+        source = source.split("/");
+        target = target.split("/");
+        source.pop()
+        while (
+          0 !== source.length &&
+          0 !== target.length &&
+          target[0] === source[0]
+        ) {
+          source.shift()
+          target.shift()
+        }
+        while (0 !== source.length) {
+          source.shift()
+          target.unshift('..')
+        }
+        return target.join("/")
+      };
 
 
     /**
@@ -240,6 +271,7 @@ var CONVERTER = (function () {
             //addDependency(ns); //this shouldn't be necessary
             return "";
         });
+
         return string;
     }
 
@@ -251,7 +283,7 @@ var CONVERTER = (function () {
         var declarePattern = /dojo\.declare\((?:'|")([\w\.]+)(?:'|"),\s*(null|[\w\.]+|\[[\w\.\s,]*\])[\S\s]*\}\);/g;
         return string.replace(declarePattern, function (all, className, parents) {
             //remove class name, it's not necessary.
-            all = all.replace(/('|")[\w\.]*('|"),\s*/, "");
+            all = all.replace(/(?:'|")([\w\.]*)(:?'|"),\s*/, "");
             //surround with define
             all = defineString(dependencies) + "var model = " + all + "\nreturn model;\n});";
             return all;
@@ -296,12 +328,17 @@ var CONVERTER = (function () {
     }
 
     return {
-        convert: function (fileString) {
-            fileString = convertDeclare(replaceOldDojo(convertRequires(fileString))).trim();
-            //hacky workaround for declare, since we only want to replace it at the end
+        //nsRoot is period delimited namespace of the file's location
+        convert: function (fileString, nsRoot) {
+            currentPath = nsRoot || fileString.match(/dojo\.declare\((?:'|")([\w\.]*)(?:'|")/)[1] || undefined;
             dependencies = {}; //reset dependencies
+            warnings = []; //reset warnings
+            fileString = convertDeclare(replaceOldDojo(convertRequires(fileString))).trim();
+            this.dependencies = dependencies;
+            this.warnings = warnings;
+            this.className = currentPath;
+            //hacky workaround for declare, since we only want to replace it at the end
             return fileString.replace(/dojo\.declare/g, "declare");
-        },
-        dependencies: dependencies
+        }
     };
 }());

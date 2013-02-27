@@ -25,6 +25,7 @@ dojo.declare('PTO.something.TheClass', [PTO.something.Thing, PTO.something.Other
         dojo.byId('someId');
         dojo.destroy();
         dojo.empty();
+        PTO.thisShouldGenerateAWarning();
         new dijit.form.Button({});
         new dijit.widget.thingy.Form();
     }
