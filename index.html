@@ -4,22 +4,28 @@
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script src="./converter.js"></script>
 <meta charset=utf-8 />
- 
 </head>
- 
+
 <body>
+<h2>Input:</h2>
+<textarea id="input" rows="30" cols="100"></textarea>
+<div><a id="convert" href="#">Convert</a></div>
 <h2>Converted Output:</h2>
 <textarea id="output" rows="30" cols="100"></textarea>
 
 <script>
     $.ajax({
-        url: './test1.js',
+        url: './test2.js',
         type: 'GET',
         dataType: 'text', //don't execute
-        success: function (data) {
-            var output = CONVERTER.convert(data);
+        success: function (initial_data) {
+            var input = initial_data,
+                output = CONVERTER.convert(input);
+            $('#input').text(input);
             $('#output').text(output);
-            console.log(CONVERTER.dependencies);
+            $('#convert').on('click', function () {
+                $('#output').text(CONVERTER.convert($('#input').val()));
+            })
         }
     });
 </script>
