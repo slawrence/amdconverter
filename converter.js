@@ -132,23 +132,30 @@ var CONVERTER = (function (global) {
                 depend: 'dijit/registry',
             },
             {
-                pattern: /PTO\.([\w\.]*)/g,
+                pattern: /PTO\.([\w\.]+)/g,
                 repFn: function (all, rest) {
                     var pieces = rest.split('.');
-                    this.depend = all;
                     //TODO: We can make assumptions here (I hope), if the last piece is capitalized it's a constructor
-                    if (pieces.length > 2) {
-                        this.alias = upperFirstChar(pieces[pieces.length - 2] + '.' +
-                                             pieces[pieces.length -1]);
+                    if (pieces[pieces.length - 1].charAt(0).match(/[A-Z]/)) {
+                        this.alias = pieces[pieces.length -1];
+                        this.depend = all;
                     } else {
-                        this.alias = upperFirstChar(rest);
+                        //it's a method
+                        if (pieces.length > 2) {
+                            this.alias = pieces[pieces.length - 2] + '.' +
+                                                 pieces[pieces.length -1];
+                            this.depend = pieces[pieces.length - 2];
+                        } else {
+                            this.alias = rest;
+                            this.depend = pieces[0];
+                        }
                     }
                 }
             }
         ];
 
 
-    function convertDeclare(string) {
+    function replaceOldDojo(string) {
         var i, replacement;
 
         //do replacements of globals based on pattern/fn
@@ -175,34 +182,84 @@ var CONVERTER = (function (global) {
                         console.error("Uh oh. Alias not specified.");
                     }
                 }
-                //TODO: Refactor
-                if (dependencies[replacement.depend]) {
-                    if (dependencies[replacement.depend][alias]) {
-                        dependencies[replacement.depend][alias] += 1;
-                    } else {
-                        dependencies[replacement.depend][alias] = 1;
-                    }
-                } else {
-                    dependencies[replacement.depend] = {};
-                    dependencies[replacement.depend][alias] = 1;
-                }
+                addDependency(replacement.depend, alias);
                 return alias;
             });
         }
         return string;
     }
 
+    //TODO: Refactor!
+    function addDependency(depend, alias) {
+        if (!dependencies[depend]) {
+            dependencies[depend] = alias;
+        }
+        //if (dependencies[depend]) {
+            //if (alias) {
+                //if (dependencies[depend][alias]) {
+                    //dependencies[depend][alias] += 1;
+                //} else {
+                    //dependencies[depend][alias] = 1;
+                //}
+            //}
+        //} else {
+            //dependencies[depend] = {};
+            //if (alias) {
+                //dependencies[depend][alias] = 1;
+            //}
+        //}
+    }
+
     function convertRequires(string) {
         //replace provide
         string = string.replace(/dojo\.provide\((?:'|")[\w\.]+(?:'|")\);/g, "");
 
-        //replace requires
+        //replace requires, add dependency
+        string = string.replace(/dojo\.require\((?:'|")([\w\.]+)(?:'|")\);/g, function (all, ns) {
+            //addDependency(ns); //this shouldn't be necessary
+            return "";
+        });
         return string;
+    }
+
+    function convertDeclare(string) {
+        return string.replace(/dojo\.declare\((?:'|")([\w\.]+)(?:'|"),\s*(null|[\w\.]+|\[[\w\.\s,]*\])[\S\s]*\}\);/g, function (all, className, parents) {
+            //remove class name, it's not necessary.
+            all = all.replace(/('|")[\w\.]*('|"),\s*/, "");
+            //add return
+            all = "return " + all;
+            //surround with define
+            all = defineString(dependencies) + all + "\n});";
+            return all;
+        });
+    }
+
+    //creates define statement given dependency object
+    //TODO: Refactor
+    function defineString(dependObject) {
+        var str = "",
+            tab = "    ",
+            cnt = 0;
+
+        for (var prop in dependObject) {
+            cnt += 1;
+        }
+
+        str += "define([" + (cnt ? "\n" : "");
+        for (var prop in dependObject) {
+            str += tab + "\"" + prop + "\"\n";
+        }
+        str += "], function (" + (cnt ? "\n" : "");
+        for (var prop in dependObject) {
+            str += tab + dependObject[prop].split('.')[0] + "\n";
+        }
+        str += ") {\n";
+        return str;
     }
 
     return {
         convert: function (fileString) {
-            return convertDeclare(convertRequires(fileString)).trim();
+            return convertDeclare(replaceOldDojo(convertRequires(fileString))).trim();
         },
         dependencies: dependencies
     };

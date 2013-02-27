@@ -29,6 +29,7 @@ dojo.declare('PTO.framework.FrameworkComponent', null, {
         }
         this.inherited(arguments);
         PTO.widget.somethingThing.methodName();
+        PTO.widget.somethingThing.ThisConstructor();
         dojo.addClass('sdfsf');
     }
 });
