@@ -26,5 +26,6 @@ dojo.declare('PTO.something.TheClass', [PTO.something.Thing, PTO.something.Other
         dojo.destroy();
         dojo.empty();
         new dijit.form.Button({});
+        new dijit.widget.thingy.Form();
     }
 });
