@@ -153,22 +153,25 @@ var CONVERTER = (function () {
                 pattern: /PTO\.([\w\.]+)/g,
                 repFn: function (all, rest) {
                     var pieces = rest.split('.'),
-                        last = pieces[pieces.length - 1];
+                        last = pieces[pieces.length - 1],
+                        toPath = function (string) {
+                            return string.replace(/^PTO\./, "").replace(/\./g, "/");
+                        };
                     //We can make assumptions here (I hope), if the last piece is capitalized it's a constructor
                     if (last.charAt(0).match(/[A-Z]/)) {
                         this.alias = last;
-                        this.depend = all;
+                        this.depend = toPath(all);
                     } else {
                         //it's a method
                         if (pieces.length > 1) {
                             //piece before last is alias
                             this.alias = pieces[pieces.length - 2] + "." + last;
                             //don't include method in dependency
-                            this.depend = all.replace(/\.[\w]+$/, "");
+                            this.depend = toPath(all.replace(/\.[\w]+$/, ""));
                         } else {
                             //not sure what to do here, e.g. PTO
                             this.alias = all;
-                            this.depend = all;
+                            this.depend = toPath(all);
                         }
                     }
                 }
@@ -260,19 +263,31 @@ var CONVERTER = (function () {
     function defineString(dependObject) {
         var str = "",
             tab = "    ",
+            array = [],
+            i,
             cnt = 0;
 
+        //let's make an array for sorting purposes
         for (var prop in dependObject) {
-            cnt += 1;
+            array.push({
+                alias: dependObject[prop],
+                depend: prop
+            });
         }
+        cnt = array.length;
+        array.sort(function (a, b) {
+            if (a.depend < b.depend) return -1;
+            if (a.depend > b.depend) return 1;
+            return 0;
+        });
 
         str += "define([" + (cnt ? "\n" : "");
-        for (var prop in dependObject) {
-            str += tab + "\"" + prop + "\"\n";
+        for (i = 0; i < cnt; i += 1) {
+            str += tab + "\"" + array[i].depend + "\"\n";
         }
         str += "], function (" + (cnt ? "\n" : "");
-        for (var prop in dependObject) {
-            str += tab + dependObject[prop].split('.')[0] + "\n";
+        for (i = 0; i < cnt; i += 1) {
+            str += tab + array[i].alias.split('.')[0] + "\n";
         }
         str += ") {\n";
         return str;
@@ -282,6 +297,7 @@ var CONVERTER = (function () {
         convert: function (fileString) {
             fileString = convertDeclare(replaceOldDojo(convertRequires(fileString))).trim();
             //hacky workaround for declare, since we only want to replace it at the end
+            dependencies = {}; //reset dependencies
             return fileString.replace(/dojo\.declare/g, "declare");
         },
         dependencies: dependencies
