@@ -1,4 +1,4 @@
-var CONVERTER = (function () {
+this.CONVERTER = (function () {
     'use strict';
     var dependencies = {},
         warnings = [],
@@ -179,10 +179,14 @@ var CONVERTER = (function () {
                 repFn: function (all, rest) {
                     var pieces = rest.split('.'),
                         last = pieces[pieces.length - 1],
+                        //will only convert to relative path is currentPath is defined
                         toRelativePath = function (string) {
-                            string = relative(currentPath.replace(/\./g, "/"), string.replace(/\./g, "/"));
-                            if (string.indexOf(".") !== 0) {
-                                string = "./" + string;
+                            if (currentPath) {
+                                string = relative(currentPath.replace(/\./g, "/"), string.replace(/\./g, "/"));
+                                if (string.indexOf(".") !== 0) {
+                                    string = "./" + string;
+                                }
+                                return string;
                             }
                             return string;
                         };
@@ -218,11 +222,8 @@ var CONVERTER = (function () {
         var i,
             replacement;
 
-        //do replacements of globals based on pattern/fn
-        for (i = 0; i < replacements.length; i += 1) {
-            replacement = replacements[i];
-
-            string = string.replace(replacement.pattern, function (all, rest) {
+        function replace(string, replacement) {
+            return string.replace(replacement.pattern, function (all, rest) {
                 var argArray, alias, fnReturn;
                 if (shouldIgnore(all)) {
                     return all;
@@ -249,6 +250,11 @@ var CONVERTER = (function () {
                 addDependency(replacement.depend, alias);
                 return alias;
             });
+        }
+
+        //do replacements of globals based on pattern/fn
+        for (i = 0; i < replacements.length; i += 1) {
+            string = replace(string, replacements[i]);
         }
         return string;
     }
@@ -321,7 +327,7 @@ var CONVERTER = (function () {
      * NOTE: We can only convert files that have one declare statement!
      */
     function convertDeclare(string) {
-        var declarePattern = /dojo\.declare\((?:'|")([\w\.]+)(?:'|"),\s*(null|[\w\.]+|\[[\w\.\s,]*\])[\S\s]*\}\);/g;
+        var declarePattern = /dojo\.declare\((?:(?:'|")([\w\.]+)(?:'|"),)?\s*(null|[\w\.]+|\[[\w\.\s,]*\])[\S\s]*\}\);/g;
         return string.replace(declarePattern, function (all, className, parents) {
             //remove class name, it's not necessary.
             all = all.replace(/(?:'|")([\w\.]*)(:?'|"),\s*/, "");
@@ -334,7 +340,11 @@ var CONVERTER = (function () {
     return {
         //nsRoot is period delimited namespace of the file's location
         convert: function (fileString, nsRoot) {
-            currentPath = nsRoot || fileString.match(/dojo\.declare\((?:'|")([\w\.]*)(?:'|")/)[1] || undefined;
+            var declarePath = fileString.match(/dojo\.declare\((?:'|")([\w\.]*)(?:'|")/);
+            currentPath = nsRoot || declarePath ? declarePath[1] : undefined;
+            if (!currentPath) {
+                warn('Current path could not be determined. Unable to provide relative paths.');
+            }
             dependencies = {}; //reset dependencies
             warnings = []; //reset warnings
             fileString = convertDeclare(replaceOldDojo(convertRequires(fileString))).trim();
