@@ -28,5 +28,16 @@ dojo.declare('PTO.something.TheClass', [PTO.something.Thing, PTO.something.Other
         PTO.thisShouldGenerateAWarning();
         new dijit.form.Button({});
         new dijit.widget.thingy.Form();
+        PTO.dialog.CONSTANT = 5;
+        var x = new PTO.widget.ConstructorProperty();
+        dijit.registry.someMethod();
+        dijit.byId('id');
+        dijit.byNode('node');
+        dojo.clone(new Sheep());
+        dojo.contentBox('box');
+        dojo.every('everyone');
+        dojo.indexOf('index of');
+        dojo.marginBox('margin box');
+        dojo.position('positive');
     }
 });

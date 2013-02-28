@@ -53,12 +53,16 @@ this.CONVERTER = (function () {
             'dojo/query': 'dojoQuery',
             'dojo/_base/event': 'dojoEvent',
             'dojo/dom-style': 'domStyle',
+            'dojo/dom-geometry': 'domGeom',
             'dojo/_base/window': 'dojoWindow',
             'dijit/registry': 'dijitRegistry'
         },
+        /**
+         * NOTE: Order matters! Each runs one after the other
+         */
         replacements = [
             {
-                pattern: /dojo\.(addClass[\w\.]*)/g,
+                pattern: /dojo\.(add)Class/g,
                 depend: 'dojo/dom-class'
             },
             {
@@ -160,11 +164,43 @@ this.CONVERTER = (function () {
                 depend: 'dojo/_base/window'
             },
             {
-                pattern: /dijit\.(byId[\w\.]*)/g,
+                pattern: /dojo\.(clone)/g,
+                depend: 'dojo/_base/lang'
+            },
+            {
+                pattern: /dojo\.(contentBox)/g,
+                depend: 'dojo/dom-geometry'
+            },
+            {
+                pattern: /dojo\.(every)/g,
+                depend: 'dojo/_base/array'
+            },
+            {
+                pattern: /dojo\.(indexOf)/g,
+                depend: 'dojo/_base/array'
+            },
+            {
+                pattern: /dojo\.(marginBox)/g,
+                depend: 'dojo/dom-geometry'
+            },
+            {
+                pattern: /dojo\.(position)/g,
+                depend: 'dojo/dom-geometry'
+            },
+            {
+                pattern: /dijit\.(byId)/g,
                 depend: 'dijit/registry'
             },
             {
-                pattern: /'ijit\.([\w\.]+)/g,
+                pattern: /dijit\.(byNode)/g,
+                depend: 'dijit/registry'
+            },
+            {
+                pattern: /dijit\.registry\.([\w\.]+)/g,
+                depend: 'dijit/registry'
+            },
+            {
+                pattern: /dijit\.([\w\.]+)/g,
                 repFn: function (all, rest) {
                     //this matches returns best guess at dijit dependency
                     var pieces = rest.split("."),
@@ -189,12 +225,18 @@ this.CONVERTER = (function () {
                             }
                             return string;
                         };
-                    //We can make assumptions here (I hope), if the last piece is capitalized it's a constructor
-                    if (last.charAt(0).match(/[A-Z]/)) {
+
+                    //First, make sure the match is not itself
+                    if (currentPath && currentPath === all) {
+                        return all; //ignore
+                    }
+
+                    //Is the match a constructor?
+                    if (last.match(/^[A-Z][a-z_\$][\w]*/)) {
                         this.alias = last;
                         this.depend = toRelativePath(all);
                     } else {
-                        //it's a method
+                        //it's a method or constant
                         if (pieces.length > 1) {
                             //piece before last is alias
                             this.alias = pieces[pieces.length - 2] + "." + last;
@@ -327,9 +369,8 @@ this.CONVERTER = (function () {
     function convertDeclare(string) {
         var declarePattern = /dojo\.declare\((?:(?:'|")([\w\.]+)(?:'|"),)?\s*(null|[\w\.]+|\[[\w\.\s,]*\])[\S\s]*\}\);/g;
         return string.replace(declarePattern, function (all, className, parents) {
-            //remove class name, it's not necessary.
-            all = all.replace(/(?:'|")([\w\.]*)(:?'|"),\s*/, "");
-            //surround with define
+            //the following line removes the global name
+            //all = all.replace(/(?:'|")([\w\.]*)(:?'|"),\s*/, "");
             all = defineString(dependencies) + "var model = " + all + "\nreturn model;\n});";
             return all;
         });

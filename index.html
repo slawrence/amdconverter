@@ -2,7 +2,16 @@
 <head>
 <title>AMD Converter</title>
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="./lib/jsdiff.js"></script>
 <script src="./converter.js"></script>
+<style>
+del {
+    background: #FFE6E6;
+}
+ins {
+    background: #E6FFE6;
+}
+</style>
 <meta charset=utf-8 />
 </head>
 
@@ -11,28 +20,47 @@
 <textarea id="input" rows="30" cols="100"></textarea>
 <div><a id="convert" href="#">Convert</a></div>
 <h2>Converted Output:</h2>
-<textarea id="output" rows="30" cols="100"></textarea>
+<div id="output" style="white-space: pre-wrap; font-family: monospace" rows="30" cols="100"></div>
+<h3>Diff with expected.js</h3>
+<div id="diff" style="white-space: pre-wrap; font-family: monospace"></div>
 <h3>Warnings:</h3>
 <ul id="warnings"></ul>
 
 <script>
-    $.ajax({
-        url: './test.js',
-        type: 'GET',
-        dataType: 'text', //don't execute
-        success: function (initial_data) {
-            var input = initial_data,
-                output = CONVERTER.convert(input);
-            $('#input').text(input);
-            $('#output').text(output);
-            $('#convert').on('click', function () {
-                $('#output').text(CONVERTER.convert($('#input').val()));
-            })
-            $.each(CONVERTER.warnings, function(index, warning) {
-                $('#warnings').append($('<li/>').text(warning));
-            });
-        }
-    });
+$.ajax({
+    url: './expected.js',
+    type: 'GET',
+    dataType: 'text',
+    success: function (expected) {
+        $.ajax({
+            url: './test.js',
+            type: 'GET',
+            dataType: 'text', //don't execute
+            success: function (initial_data) {
+
+                function run(input) {
+                    var output = CONVERTER.convert(input);
+                        diffResult = diffString(expected, output);
+                    $('#input').text(input);
+                    $('#output').empty().append(output);
+                    $.each(CONVERTER.warnings, function(index, warning) {
+                        $('#warnings').append($('<li/>').text(warning));
+                    });
+                    if (!diffResult.match(/<ins>|<del>/)) {
+                        diffResult = "No difference between input and expected.js";
+                    }
+                    $('#diff').empty().append(diffResult);
+                }
+
+                $('#convert').on('click', function () {
+                    run($('#input').val());
+                });
+
+                run(initial_data);
+            }
+        });
+    }
+});
 </script>
 
 </body>
