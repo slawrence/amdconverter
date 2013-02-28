@@ -10,7 +10,6 @@ this.CONVERTER = (function () {
         ignore = {
             'PTO.app': true,
             'PTO.config': true,
-            'PTO.isUndefined': true,
             'PTO.log': true
         },
         shouldIgnore = function (string) {
@@ -165,7 +164,7 @@ this.CONVERTER = (function () {
                 depend: 'dijit/registry'
             },
             {
-                pattern: /dijit\.([\w\.]+)/g,
+                pattern: /'ijit\.([\w\.]+)/g,
                 repFn: function (all, rest) {
                     //this matches returns best guess at dijit dependency
                     var pieces = rest.split("."),
@@ -202,10 +201,9 @@ this.CONVERTER = (function () {
                             //don't include method in dependency
                             this.depend = toRelativePath(all.replace(/\.[\w]+$/, ""));
                         } else {
-                            //not sure what to do here, e.g. PTO
-                            warn('A method off PTO was found: ' + all);
-                            this.alias = all;
-                            this.depend = toRelativePath(all);
+                            //this will be methods directly off PTO, i.e. PTO.isDefined, PTO.isUndefined
+                            this.alias = "lang." + rest;
+                            this.depend = toRelativePath("PTO.lang");
                         }
                     }
                 }
