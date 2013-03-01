@@ -40,6 +40,16 @@ this.CONVERTER = (function () {
             }
             return target.join("/");
         },
+        toRelativePath = function (string, current) {
+            if (current) {
+                string = relative(current.replace(/\./g, "/"), string.replace(/\./g, "/"));
+                if (string.indexOf(".") !== 0) {
+                    string = "./" + string;
+                }
+                return string;
+            }
+            return string;
+        },
         dependNameMap = {
             'dojo/dom-class': 'domClass',
             'dojo/dom-attr': 'domAttr',
@@ -116,7 +126,7 @@ this.CONVERTER = (function () {
                 depend: 'dojo/_base/lang'
             },
             {
-                pattern: /dojo\.(keys[\w\.]*)/g,
+                pattern: /dojo\.keys[\.]?([\w\.]*)/g,
                 depend: 'dojo/keys'
             },
             {
@@ -210,21 +220,17 @@ this.CONVERTER = (function () {
                 }
             },
             {
+                pattern: /PTO\.constants\.([\w\.]+)/g,
+                repFn: function (all, rest) {
+                    this.alias = 'constants.' + rest;
+                    this.depend = toRelativePath('PTO.constants', currentPath);
+                }
+            },
+            {
                 pattern: /PTO\.([\w\.]+)/g,
                 repFn: function (all, rest) {
                     var pieces = rest.split('.'),
-                        last = pieces[pieces.length - 1],
-                        //will only convert to relative path is currentPath is defined
-                        toRelativePath = function (string) {
-                            if (currentPath) {
-                                string = relative(currentPath.replace(/\./g, "/"), string.replace(/\./g, "/"));
-                                if (string.indexOf(".") !== 0) {
-                                    string = "./" + string;
-                                }
-                                return string;
-                            }
-                            return string;
-                        };
+                        last = pieces[pieces.length - 1];
 
                     //First, make sure the match is not itself
                     if (currentPath && currentPath === all) {
@@ -234,18 +240,18 @@ this.CONVERTER = (function () {
                     //Is the match a constructor?
                     if (last.match(/^[A-Z][a-z_\$][\w]*/)) {
                         this.alias = last;
-                        this.depend = toRelativePath(all);
+                        this.depend = toRelativePath(all, currentPath);
                     } else {
                         //it's a method or constant
                         if (pieces.length > 1) {
                             //piece before last is alias
                             this.alias = pieces[pieces.length - 2] + "." + last;
                             //don't include method in dependency
-                            this.depend = toRelativePath(all.replace(/\.[\w]+$/, ""));
+                            this.depend = toRelativePath(all.replace(/\.[\w]+$/, ""), currentPath);
                         } else {
                             //this will be methods directly off PTO, i.e. PTO.isDefined, PTO.isUndefined
                             this.alias = "lang." + rest;
-                            this.depend = toRelativePath("PTO.lang");
+                            this.depend = toRelativePath("PTO.lang", currentPath);
                         }
                     }
                 }
@@ -282,7 +288,7 @@ this.CONVERTER = (function () {
                     alias = replacement.alias;
                 } else {
                     //lookup on dependency map
-                    alias = dependNameMap[replacement.depend] + "." + rest;
+                    alias = dependNameMap[replacement.depend] + (rest ? "." + rest : "");
                     if (!alias) {
                         console.error("Uh oh. Alias not specified.");
                     }

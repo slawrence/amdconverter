@@ -39,5 +39,10 @@ dojo.declare('PTO.something.TheClass', [PTO.something.Thing, PTO.something.Other
         dojo.indexOf('index of');
         dojo.marginBox('margin box');
         dojo.position('positive');
+        PTO.constants.SOMETHING = 23434;
+        PTO.constants.widget.lowercaseoffconstants = 'sdfsdf';
+        var a = dojo.keys;
+        var b = dojo.keys.ENTER;
+        var c = dojo.keys.some.ENTER.plus.ESC;
     }
 });

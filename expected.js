@@ -4,6 +4,7 @@
 
 define([
     "../Widget",
+    "../constants",
     "../dialog",
     "../formatters",
     "../lang",
@@ -22,9 +23,11 @@ define([
     "dojo/dom-attr",
     "dojo/dom-class",
     "dojo/dom-construct",
-    "dojo/dom-geometry"
+    "dojo/dom-geometry",
+    "dojo/keys"
 ], function (
     Widget,
+    constants,
     dialog,
     formatters,
     lang,
@@ -43,7 +46,8 @@ define([
     domAttr,
     domClass,
     domConstruct,
-    domGeom
+    domGeom,
+    keys
 ) {
 var model = declare('PTO.something.TheClass', [Thing, OtherThing], {
     constructor: function () {
@@ -75,6 +79,11 @@ var model = declare('PTO.something.TheClass', [Thing, OtherThing], {
         dojoArray.indexOf('index of');
         domGeom.marginBox('margin box');
         domGeom.position('positive');
+        constants.SOMETHING = 23434;
+        constants.widget.lowercaseoffconstants = 'sdfsdf';
+        var a = keys;
+        var b = keys.ENTER;
+        var c = keys.some.ENTER.plus.ESC;
     }
 });
 return model;
