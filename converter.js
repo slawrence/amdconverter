@@ -318,7 +318,6 @@ this.CONVERTER = (function () {
         pieces = oldString.split(delimiters);
         for (i = 0; i < pieces.length; i += 1) {
             piece = pieces[i];
-            console.log(piece, 'currentString: ' + currentString, 'inString: ' + inString);
             if (currentComment) {
                 if ((currentComment !== "//" && piece === "*/") || (currentComment === "//" && piece.match(/(\r\n?|\n)/))) {
                     currentComment = undefined;
@@ -335,7 +334,7 @@ this.CONVERTER = (function () {
                 if (currentString && currentString === piece) {
                     currentString = undefined;
                 } else {
-                    if (piece === "'" || piece === '"') {
+                    if (!currentString && (piece === "'" || piece === '"')) {
                         currentString = piece;
                     }
                 }

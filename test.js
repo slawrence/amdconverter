@@ -33,6 +33,7 @@ dojo.declare('PTO.something.TheClass', [PTO.something.Thing, PTO.something.Other
         dojo.place('' + title + '', html);
         dojo.place('<span id="printCaseTitle" style="display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%;">' +
                 title + '</span>', html);
+        
         dojo.destroy();
         dojo.place('');
         dojo.forEach('');

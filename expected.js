@@ -72,7 +72,13 @@ var model = declare('PTO.something.TheClass', [Thing, OtherThing], {
         domClass.add('class');
         domAttr.attr('aria');
         dojoDom.byId('someId');
+        domConstruct.place('' + title + '', html);
+        domConstruct.place('<span id="printCaseTitle" style="display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%;">' +
+                title + '</span>', html);
+        
         domConstruct.destroy();
+        domConstruct.place('');
+        dojoArray.forEach('');
         domConstruct.empty();
         lang.thisShouldGenerateAWarning();
         new dijitButton({});
