@@ -10,39 +10,6 @@ dojo.require('PTO.widget');
  */
 
 dojo.declare('PTO.something.TheClass', [PTO.something.Thing, PTO.something.OtherThing], {
-    constructor: function () {
-        var obj = new PTO.some.Class(),
-            obj2 = new PTO.Widget(),
-            formatted = PTO.formatters.formatName('John Doe');
-        PTO.thing.config.setConfigurationColor('blue');
-        dojo.hitch({}, function (this.toString()));
-    },
-
-    aMethod: function () {
-        PTO.log.debug('This should be ignored');
-        dojo.addClass('class');
-        dojo.attr('aria');
-        dojo.byId('someId');
-        dojo.destroy();
-        dojo.empty();
-        PTO.thisShouldGenerateAWarning();
-        new dijit.form.Button({});
-        new dijit.widget.thingy.Form();
-        PTO.dialog.CONSTANT = 5;
-        var x = new PTO.widget.ConstructorProperty();
-        dijit.registry.someMethod();
-        dijit.byId('id');
-        dijit.byNode('node');
-        dojo.clone(new Sheep());
-        dojo.contentBox('box');
-        dojo.every('everyone');
-        dojo.indexOf('index of');
-        dojo.marginBox('margin box');
-        dojo.position('positive');
-        PTO.constants.SOMETHING = 23434;
-        PTO.constants.widget.lowercaseoffconstants = 'sdfsdf';
-        var a = dojo.keys;
-        var b = dojo.keys.ENTER;
-        var c = dojo.keys.some.ENTER.plus.ESC;
-    }
+        dojo.place('<span id="printCaseTitle" style="display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%;">' +
+                title + '</span>', html);
 });

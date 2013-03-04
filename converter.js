@@ -1,3 +1,4 @@
+var one;
 this.CONVERTER = (function () {
     'use strict';
     var dependencies = {},
@@ -76,23 +77,23 @@ this.CONVERTER = (function () {
                 depend: 'dojo/dom-class'
             },
             {
-                pattern: /dojo\.(attr[\w\.]*)/g,
+                pattern: /dojo\.(attr)/g,
                 depend: 'dojo/dom-attr'
             },
             {
-                pattern: /dojo\.(byId[\w\.]*)/g,
+                pattern: /dojo\.(byId)/g,
                 depend: 'dojo/dom'
             },
             {
-                pattern: /dojo\.(connect[\w\.]*)/g,
+                pattern: /dojo\.(connect)/g,
                 depend: 'dojo/_base/connect'
             },
             {
-                pattern: /dojo\.(create[\w\.]*)/g,
+                pattern: /dojo\.(create)/g,
                 depend: 'dojo/dom-construct'
             },
             {
-                pattern: /dojo\.(declare[\w\.]*)/g,
+                pattern: /dojo\.(declare)/g,
                 depend: 'dojo/_base/declare',
                 alias: 'declare',
                 repFn: function (all) {
@@ -102,27 +103,27 @@ this.CONVERTER = (function () {
                 }
             },
             {
-                pattern: /dojo\.(destroy[\w\.]*)/g,
+                pattern: /dojo\.(destroy)/g,
                 depend: 'dojo/dom-construct'
             },
             {
-                pattern: /dojo\.(disconnect[\w\.]*)/g,
+                pattern: /dojo\.(disconnect)/g,
                 depend: 'dojo/_base/connect'
             },
             {
-                pattern: /dojo\.(empty[\w\.]*)/g,
+                pattern: /dojo\.(empty)/g,
                 depend: 'dojo/dom-construct'
             },
             {
-                pattern: /dojo\.(forEach[\w\.]*)/g,
+                pattern: /dojo\.(forEach)/g,
                 depend: 'dojo/_base/array'
             },
             {
-                pattern: /dojo\.(hasClass[\w\.]*)/g,
+                pattern: /dojo\.(hasClass)/g,
                 depend: 'dojo/dom-class'
             },
             {
-                pattern: /dojo\.(hitch[\w\.]*)/g,
+                pattern: /dojo\.(hitch)/g,
                 depend: 'dojo/_base/lang'
             },
             {
@@ -130,43 +131,43 @@ this.CONVERTER = (function () {
                 depend: 'dojo/keys'
             },
             {
-                pattern: /dojo\.(map[\w\.]*)/g,
+                pattern: /dojo\.(map)/g,
                 depend: 'dojo/_base/array'
             },
             {
-                pattern: /dojo\.(mixin[\w\.]*)/g,
+                pattern: /dojo\.(mixin)/g,
                 depend: 'dojo/_base/lang'
             },
             {
-                pattern: /dojo\.(place[\w\.]*)/g,
+                pattern: /dojo\.(place)/g,
                 depend: 'dojo/dom-construct'
             },
             {
-                pattern: /dojo\.(query[\w\.]*)/g,
+                pattern: /dojo\.(query)/g,
                 depend: 'dojo/query'
             },
             {
-                pattern: /dojo\.(removeClass[\w\.]*)/g,
+                pattern: /dojo\.(removeClass)/g,
                 depend: 'dojo/dom-class'
             },
             {
-                pattern: /dojo\.(replaceClass[\w\.]*)/g,
+                pattern: /dojo\.(replaceClass)/g,
                 depend: 'dojo/dom-class'
             },
             {
-                pattern: /dojo\.(some[\w\.]*)/g,
+                pattern: /dojo\.(some)/g,
                 depend: 'dojo/_base/array'
             },
             {
-                pattern: /dojo\.(stopEvent[\w\.]*)/g,
+                pattern: /dojo\.(stopEvent)/g,
                 depend: 'dojo/_base/event'
             },
             {
-                pattern: /dojo\.(style[\w\.]*)/g,
+                pattern: /dojo\.(style)/g,
                 depend: 'dojo/dom-style'
             },
             {
-                pattern: /dojo\.(toggleClass[\w\.]*)/g,
+                pattern: /dojo\.(toggleClass)/g,
                 depend: 'dojo/dom-class'
             },
             {
@@ -258,53 +259,99 @@ this.CONVERTER = (function () {
             }
         ];
 
+
+    /**
+     * Runs a replacement operation on a string using the replacements array
+     */
+    function replace(string, replacement, inString, inComment) {
+        return string.replace(replacement.pattern, function (all, rest) {
+            var argArray, alias, fnReturn;
+            if (shouldIgnore(all) || (!replacement.commentAgnostic && inComment) || (!replacement.stringAgnostic && inString)) {
+                return all;
+            }
+            //apply fn if defined
+            if (replacement.repFn) {
+                argArray = Array.prototype.slice.apply(arguments);
+                fnReturn = replacement.repFn.apply(replacement, argArray);
+                //allow repFn to define replacement directly if it desires
+                if (typeof fnReturn !== "undefined") {
+                    return fnReturn;
+                }
+            }
+
+            //determine alias (a repFn may define one)
+            if (replacement.alias) {
+                alias = replacement.alias;
+                if (!replacement.depend) {
+                    console.error("Uh oh. Dependency not defined for alias");
+                }
+            } else {
+                //If an alias was not defined, use default alias based on depend map and regex 'rest' capture
+                alias = dependNameMap[replacement.depend] + (rest ? "." + rest : "");
+                if (!alias) {
+                    console.error("Uh oh. Alias not specified.");
+                }
+            }
+            addDependency(replacement.depend, alias);
+            return alias;
+        });
+    }
+
     /**
      * Loops through replacements array. If the pattern is found the following steps are executed:
      * 1. return all (do no replacement) if should be ignored
      * 2. apply fn if defined
      * 3. assign dependency with alias to dependencies map
      */
-    function replaceOldDojo(string) {
+    function replaceOldDojo(oldString) {
         var i,
-            replacement;
+            j,
+            whole = "",
+            pieces,
+            piece,
+            currentComment,
+            currentString,
+            inComment = false,
+            inString = false,
+            delimiters = /(\/\*|\*\/|"|'|\/\/|(?:\r\n?|\n))/g;
 
-        function replace(string, replacement) {
-            return string.replace(replacement.pattern, function (all, rest) {
-                var argArray, alias, fnReturn;
-                if (shouldIgnore(all)) {
-                    return all;
+        pieces = oldString.split(delimiters);
+        for (i = 0; i < pieces.length; i += 1) {
+            piece = pieces[i];
+            console.log(piece, 'currentString: ' + currentString, 'inString: ' + inString);
+            if (currentComment) {
+                if ((currentComment !== "//" && piece === "*/") || (currentComment === "//" && piece.match(/(\r\n?|\n)/))) {
+                    currentComment = undefined;
                 }
-                //apply fn if defined
-                if (replacement.repFn) {
-                    argArray = Array.prototype.slice.apply(arguments);
-                    fnReturn = replacement.repFn.apply(replacement, argArray);
-                    //allow repFn to define replacement directly if it desires
-                    if (typeof fnReturn !== "undefined") {
-                        return fnReturn;
-                    }
+            } else {
+                if (piece === "/*" || piece === "//") {
+                    currentComment = piece;
                 }
-                //determine alias (a repFn may define one)
-                if (replacement.alias) {
-                    alias = replacement.alias;
+            }
+            inComment = !!currentComment;
+
+            //only handle strings if not in a comment
+            if (!inComment) {
+                if (currentString && currentString === piece) {
+                    currentString = undefined;
                 } else {
-                    //lookup on dependency map
-                    alias = dependNameMap[replacement.depend] + (rest ? "." + rest : "");
-                    if (!alias) {
-                        console.error("Uh oh. Alias not specified.");
+                    if (piece === "'" || piece === '"') {
+                        currentString = piece;
                     }
                 }
-                addDependency(replacement.depend, alias);
-                return alias;
-            });
-        }
+                inString = !!currentString;
+            }
 
-        //do replacements of globals based on pattern/fn
-        for (i = 0; i < replacements.length; i += 1) {
-            string = replace(string, replacements[i]);
+            //run the replacements
+            for (j = 0; j < replacements.length; j += 1) {
+                if (!piece.match(delimiters)) {
+                    piece = replace(piece, replacements[j], inString, inComment);
+                }
+            }
+            whole += piece;
         }
-        return string;
+        return whole;
     }
-
 
     /**
      * Basically replaces provide/require with empty strings

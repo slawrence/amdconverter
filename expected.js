@@ -7,6 +7,7 @@ define([
     "../constants",
     "../dialog",
     "../formatters",
+    "../gadget",
     "../lang",
     "../some/Class",
     "../thing/config",
@@ -30,6 +31,7 @@ define([
     constants,
     dialog,
     formatters,
+    gadget,
     lang,
     Class,
     config,
@@ -59,6 +61,13 @@ var model = declare('PTO.something.TheClass', [Thing, OtherThing], {
     },
 
     aMethod: function () {
+        /**
+         * Don't add this PTO.testing.framework.widget
+         * // hope this doesn't cause problems // /////
+         * " " ' //
+         */
+        // /* hello */ /* //'" /* \ndojo.elephant(); PTO.testing.somewhere.over
+        gadget.class('PTO.GoGo.Gadget');
         PTO.log.debug('This should be ignored');
         domClass.add('class');
         domAttr.attr('aria');
