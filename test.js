@@ -4,12 +4,15 @@ dojo.require('PTO.some.Class');
 dojo.require('PTO.thing.config');
 dojo.require('PTO.formatters');
 dojo.require('PTO.widget');
+dojo.require('PTO.schema.services.ClaimService');
+dojo.require('PTO.schema.services.SearchService');
+dojo.require('PTO.schema.services.ClaimSetService');
 
 /**
  * @class PTO.something.TheClass
  */
 
-dojo.declare('PTO.something.TheClass', [PTO.something.Thing, PTO.something.OtherThing], {
+dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, PTO.something.OtherThing], {
     constructor: function () {
         var obj = new PTO.some.Class(),
             obj2 = new PTO.Widget(),
@@ -50,6 +53,7 @@ dojo.declare('PTO.something.TheClass', [PTO.something.Thing, PTO.something.Other
         dojo.contentBox('box');
         dojo.every('everyone');
         dojo.indexOf('index of');
+        ORE.lang.isDefined('sdfsf');
         dojo.marginBox('margin box');
         dojo.position('positive');
         PTO.constants.SOMETHING = 23434;
@@ -57,5 +61,11 @@ dojo.declare('PTO.something.TheClass', [PTO.something.Thing, PTO.something.Other
         var a = dojo.keys;
         var b = dojo.keys.ENTER;
         var c = dojo.keys.some.ENTER.plus.ESC;
+        PTO.widget.document.getDocumentViewerLoader = function () {
+            if (!loader) {
+                loader = new PTO.widget.document.DocumentViewerLoader();
+            }
+            return loader;
+        };
     }
 });

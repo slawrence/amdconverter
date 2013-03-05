@@ -235,6 +235,7 @@ this.CONVERTER = (function () {
 
                     //First, make sure the match is not itself
                     if (currentPath && currentPath === all) {
+                        warn('Reference to itself found. Not replacing: ' + all);
                         return all; //ignore
                     }
 
@@ -255,6 +256,13 @@ this.CONVERTER = (function () {
                             this.depend = toRelativePath("PTO.lang", currentPath);
                         }
                     }
+                }
+            },
+            {
+                pattern: /ORE\.([\w\.]+)/g,
+                repFn: function (all, rest) {
+                    warn('Reference to ORE found: ' + all)
+                    return all;
                 }
             }
         ];
@@ -353,9 +361,9 @@ this.CONVERTER = (function () {
     }
 
     /**
-     * Basically replaces provide/require with empty strings
+     * Basically replaces provide/require wit) empty strings
      */
-    function convertRequires(string) {
+    function convertRequires(string, path) {
         var providePattern = /dojo\.provide\((?:'|")[\w\.]+(?:'|")\);/g,
             requirePattern = /dojo\.require\((?:'|")([\w\.]+)(?:'|")\);/g;
         //replace provide
@@ -363,8 +371,12 @@ this.CONVERTER = (function () {
 
         //replace requires, add dependency
         string = string.replace(requirePattern, function (all, ns) {
-            //TODO: Schemas have to be added to dependencies here?
-            //addDependency(ns); //this shouldn't be necessary
+            var match = ns.match(/PTO\.schema\.services\.([\w\.]+)/),
+                alias;
+            if (match) {
+                alias = match[1];
+                addDependency(toRelativePath("PTO.schema.services", path) + "/" + alias, alias);
+            }
             return "";
         });
 
@@ -419,29 +431,41 @@ this.CONVERTER = (function () {
      * NOTE: We can only convert files that have one declare statement!
      */
     function convertDeclare(string) {
-        var declarePattern = /dojo\.declare\((?:(?:'|")([\w\.]+)(?:'|"),)?\s*(null|[\w\.]+|\[[\w\.\s,]*\])[\S\s]*\}\);/g;
-        return string.replace(declarePattern, function (all, className, parents) {
-            //the following line removes the global name
-            //all = all.replace(/(?:'|")([\w\.]*)(:?'|"),\s*/, "");
-            all = defineString(dependencies) + "var model = " + all + "\nreturn model;\n});";
-            return all;
+        var declarePattern = /dojo\.declare\((?:(?:'|")([\w\.]+)(?:'|"),)?\s*(null|[\w\.]+|\[[\w\.\s,]*\])([\S\s]*)\}\);/g;
+        return string.replace(declarePattern, function (all, className, parents, rest) {
+            var newDeclare = "declare('" + className + "', " + parents + rest;
+            newDeclare = defineString(dependencies) + "var model = " + newDeclare + "\n});\nreturn model;\n});";
+            return newDeclare;
         });
+    }
+
+    /**
+     * We use the first argument of the declare signature to get the current "path"
+     */
+    function getCurrentPath(string, nsRoot) {
+        var declarePath = string.match(/dojo\.declare\((?:'|")([\w\.]*)(?:'|")/);
+        currentPath = nsRoot || declarePath ? declarePath[1] : undefined;
+        if (!currentPath) {
+            warn('Current path could not be determined. Unable to provide relative paths.');
+        }
+    }
+
+    /**
+     * In case the same instance is used repeatedly, reset private vars
+     */
+    function reset() {
+        dependencies = {};
+        warnings = [];
+        currentPath = undefined;
     }
 
     return {
         //nsRoot is period delimited namespace of the file's location
         convert: function (fileString, nsRoot) {
-            var declarePath = fileString.match(/dojo\.declare\((?:'|")([\w\.]*)(?:'|")/);
-            currentPath = nsRoot || declarePath ? declarePath[1] : undefined;
-            if (!currentPath) {
-                warn('Current path could not be determined. Unable to provide relative paths.');
-            }
-            dependencies = {}; //reset dependencies
-            warnings = []; //reset warnings
-            fileString = convertDeclare(replaceOldDojo(convertRequires(fileString))).trim();
-            this.dependencies = dependencies;
+            reset();
+            getCurrentPath(fileString, nsRoot);
+            fileString = convertDeclare(replaceOldDojo(convertRequires(fileString, currentPath))).trim();
             this.warnings = warnings;
-            this.className = currentPath;
             //hacky workaround for declare, since we only want to replace it at the end
             return fileString.replace(/dojo\.declare/g, "declare");
         }

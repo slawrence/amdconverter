@@ -3,17 +3,20 @@
  */
 
 define([
-    "../Widget",
-    "../constants",
-    "../dialog",
-    "../formatters",
-    "../gadget",
-    "../lang",
-    "../some/Class",
-    "../thing/config",
-    "../widget/ConstructorProperty",
-    "./OtherThing",
-    "./Thing",
+    "../../Widget",
+    "../../constants",
+    "../../dialog",
+    "../../formatters",
+    "../../gadget",
+    "../../lang",
+    "../../schema/services/ClaimService",
+    "../../schema/services/ClaimSetService",
+    "../../schema/services/SearchService",
+    "../../some/Class",
+    "../../something/OtherThing",
+    "../../something/Thing",
+    "../../thing/config",
+    "../ConstructorProperty",
     "dijit/form/Button",
     "dijit/registry",
     "dijit/widget/thingy/Form",
@@ -33,11 +36,14 @@ define([
     formatters,
     gadget,
     lang,
+    ClaimService,
+    ClaimSetService,
+    SearchService,
     Class,
-    config,
-    ConstructorProperty,
     OtherThing,
     Thing,
+    config,
+    ConstructorProperty,
     dijitButton,
     dijitRegistry,
     dijitForm,
@@ -51,7 +57,7 @@ define([
     domGeom,
     keys
 ) {
-var model = declare('PTO.something.TheClass', [Thing, OtherThing], {
+var model = declare('PTO.widget.document.DocumentViewerLoader', [Thing, OtherThing], {
     constructor: function () {
         var obj = new Class(),
             obj2 = new Widget(),
@@ -92,6 +98,7 @@ var model = declare('PTO.something.TheClass', [Thing, OtherThing], {
         domGeom.contentBox('box');
         dojoArray.every('everyone');
         dojoArray.indexOf('index of');
+        ORE.lang.isDefined('sdfsf');
         domGeom.marginBox('margin box');
         domGeom.position('positive');
         constants.SOMETHING = 23434;
@@ -99,6 +106,13 @@ var model = declare('PTO.something.TheClass', [Thing, OtherThing], {
         var a = keys;
         var b = keys.ENTER;
         var c = keys.some.ENTER.plus.ESC;
+        document.getDocumentViewerLoader = function () {
+            if (!loader) {
+                loader = new PTO.widget.document.DocumentViewerLoader();
+            }
+            return loader;
+        };
+        
     }
 });
 return model;
