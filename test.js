@@ -61,11 +61,23 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         var a = dojo.keys;
         var b = dojo.keys.ENTER;
         var c = dojo.keys.some.ENTER.plus.ESC;
+        PTO.widget.document.Something = {};
+        PTO.widget.document.something.getOut();
+        PTO.widget.document.getOut();
         PTO.widget.document.getDocumentViewerLoader = function () {
             if (!loader) {
                 loader = new PTO.widget.document.DocumentViewerLoader();
             }
             return loader;
         };
+        dijit.popup.open({this: 'this'});
+        dijit.popup.close({this: 'this'});
+        dijit.placeOnScreen();
+        dojo.style('arg1', arg2, arg3);
+        dojo.style('arg1', arg2);
+        dojo.stopEvent();
+        dojo.toggleClass();
+        dojo.removeClass();
+        dojo.query('sdfsdf', dom);
     }
 });

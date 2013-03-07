@@ -1,7 +1,6 @@
 /**
  * @class PTO.something.TheClass
  */
-
 define([
     "../../Widget",
     "../../constants",
@@ -17,18 +16,26 @@ define([
     "../../something/Thing",
     "../../thing/config",
     "../ConstructorProperty",
+    "../document",
+    "./Something",
+    "./something",
     "dijit/form/Button",
+    "dijit/place",
+    "dijit/popup",
     "dijit/registry",
     "dijit/widget/thingy/Form",
     "dojo/_base/array",
     "dojo/_base/declare",
+    "dojo/_base/event",
     "dojo/_base/lang",
     "dojo/dom",
     "dojo/dom-attr",
     "dojo/dom-class",
     "dojo/dom-construct",
     "dojo/dom-geometry",
-    "dojo/keys"
+    "dojo/dom-style",
+    "dojo/keys",
+    "dojo/query"
 ], function (
     Widget,
     constants,
@@ -44,18 +51,26 @@ define([
     Thing,
     config,
     ConstructorProperty,
+    document,
+    Something,
+    something,
     dijitButton,
+    dijitPlace,
+    dijitPopup,
     dijitRegistry,
     dijitForm,
     dojoArray,
     declare,
+    dojoEvent,
     dojoLang,
     dojoDom,
     domAttr,
     domClass,
     domConstruct,
     domGeom,
-    keys
+    domStyle,
+    keys,
+    dojoQuery
 ) {
 var model = declare('PTO.widget.document.DocumentViewerLoader', [Thing, OtherThing], {
     constructor: function () {
@@ -106,13 +121,24 @@ var model = declare('PTO.widget.document.DocumentViewerLoader', [Thing, OtherThi
         var a = keys;
         var b = keys.ENTER;
         var c = keys.some.ENTER.plus.ESC;
+        Something = {};
+        something.getOut();
+        document.getOut();
         document.getDocumentViewerLoader = function () {
             if (!loader) {
                 loader = new PTO.widget.document.DocumentViewerLoader();
             }
             return loader;
         };
-        
+        dijitPopup.open({this: 'this'});
+        dijitPopup.close({this: 'this'});
+        dijitPlace.at();
+        domStyle.set('arg1', arg2, arg3);
+        domStyle.set('arg1', arg2);
+        dojoEvent.stop();
+        domClass.toggle();
+        domClass.remove();
+        dojoQuery('sdfsdf', dom);
     }
 });
 return model;

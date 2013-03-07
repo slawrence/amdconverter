@@ -5,7 +5,6 @@ this.CONVERTER = (function () {
         warnings = [],
         currentPath,
         warn = function (message) {
-            console.log(message);
             warnings.push(message);
         },
         ignore = {
@@ -42,8 +41,18 @@ this.CONVERTER = (function () {
             return target.join("/");
         },
         toRelativePath = function (string, current) {
+            var before = string, pieces;
             if (current) {
                 string = relative(current.replace(/\./g, "/"), string.replace(/\./g, "/"));
+                //hack workaround for references to the folder current class is in
+                if (string === "") {
+                    pieces = current.split('.');
+                    if (pieces.length > 2) {
+                        return "../" + pieces[pieces.length - 2];
+                    }
+                    warn('Difficulties defining relative path for: ' + string + ' - ignoring');
+                    return current;
+                }
                 if (string.indexOf(".") !== 0) {
                     string = "./" + string;
                 }
@@ -61,12 +70,12 @@ this.CONVERTER = (function () {
             'dojo/_base/array': 'dojoArray',
             'dojo/_base/lang': 'dojoLang',
             'dojo/keys': 'keys',
-            'dojo/query': 'dojoQuery',
             'dojo/_base/event': 'dojoEvent',
             'dojo/dom-style': 'domStyle',
             'dojo/dom-geometry': 'domGeom',
             'dojo/_base/window': 'dojoWindow',
-            'dijit/registry': 'dijitRegistry'
+            'dijit/registry': 'dijitRegistry',
+            'dijit/popup': 'dijitPopup'
         },
         /**
          * NOTE: Order matters! Each runs one after the other
@@ -143,11 +152,12 @@ this.CONVERTER = (function () {
                 depend: 'dojo/dom-construct'
             },
             {
-                pattern: /dojo\.(query)/g,
+                pattern: /dojo\.query/g,
+                alias: 'dojoQuery',
                 depend: 'dojo/query'
             },
             {
-                pattern: /dojo\.(removeClass)/g,
+                pattern: /dojo\.(remove)Class/g,
                 depend: 'dojo/dom-class'
             },
             {
@@ -159,15 +169,25 @@ this.CONVERTER = (function () {
                 depend: 'dojo/_base/array'
             },
             {
-                pattern: /dojo\.(stopEvent)/g,
+                pattern: /dojo\.(stop)Event/g,
                 depend: 'dojo/_base/event'
             },
             {
-                pattern: /dojo\.(style)/g,
-                depend: 'dojo/dom-style'
+                pattern: /dojo\.style/g,
+                depend: 'dojo/dom-style',
+                alias: 'domStyle.set',
+                repFn: (function (all) {
+                    var alreadyWarned = false;
+                    return function () {
+                        if (!alreadyWarned) {
+                            warn('WARNING - This file contains references to dojo.style. All instances were replaced by domStyle.set. You need to check to make sure that domStyle.get was not actually needed in the case only two arguments.');
+                            alreadyWarned = true;
+                        }
+                    };
+                }())
             },
             {
-                pattern: /dojo\.(toggleClass)/g,
+                pattern: /dojo\.(toggle)Class/g,
                 depend: 'dojo/dom-class'
             },
             {
@@ -197,6 +217,15 @@ this.CONVERTER = (function () {
             {
                 pattern: /dojo\.(position)/g,
                 depend: 'dojo/dom-geometry'
+            },
+            {
+                pattern: /dijit\.popup\.([\w\.]*)/g,
+                depend: 'dijit/popup'
+            },
+            {
+                pattern: /dijit\.placeOnScreen/g,
+                alias: 'dijitPlace.at',
+                depend: 'dijit/place'
             },
             {
                 pattern: /dijit\.(byId)/g,
@@ -261,7 +290,7 @@ this.CONVERTER = (function () {
             {
                 pattern: /ORE\.([\w\.]+)/g,
                 repFn: function (all, rest) {
-                    warn('Reference to ORE found: ' + all)
+                    warn('Reference to ORE found: ' + all);
                     return all;
                 }
             }
