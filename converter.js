@@ -75,7 +75,8 @@ this.CONVERTER = (function () {
             'dojo/dom-geometry': 'domGeom',
             'dojo/_base/window': 'dojoWindow',
             'dijit/registry': 'dijitRegistry',
-            'dijit/popup': 'dijitPopup'
+            'dijit/popup': 'dijitPopup',
+            'dijit/focus': 'dijitFocus'
         },
         /**
          * NOTE: Order matters! Each runs one after the other
@@ -86,8 +87,15 @@ this.CONVERTER = (function () {
                 depend: 'dojo/dom-class'
             },
             {
+                pattern: /dojo\.(trim)/g,
+                depend: 'dojo/_base/lang'
+            },
+            {
                 pattern: /dojo\.(attr)/g,
-                depend: 'dojo/dom-attr'
+                depend: 'dojo/dom-attr',
+                repFn: function (all) {
+                    warn('WARNING: Found a reference to dojo.attr: Because of the changes to dojo API you will have to manually find each instance and replace "attr" method with either get/set/has/etc. Also see dom-prop.');
+                }
             },
             {
                 pattern: /dojo\.(byId)/g,
@@ -238,6 +246,10 @@ this.CONVERTER = (function () {
             {
                 pattern: /dijit\.registry\.([\w\.]+)/g,
                 depend: 'dijit/registry'
+            },
+            {
+                pattern: /dijit\.(focus)/g,
+                depend: 'dijit/focus'
             },
             {
                 pattern: /dijit\.([\w\.]+)/g,

@@ -19,6 +19,7 @@ define([
     "../document",
     "./Something",
     "./something",
+    "dijit/focus",
     "dijit/form/Button",
     "dijit/place",
     "dijit/popup",
@@ -54,6 +55,7 @@ define([
     document,
     Something,
     something,
+    dijitFocus,
     dijitButton,
     dijitPlace,
     dijitPopup,
@@ -139,6 +141,8 @@ var model = declare('PTO.widget.document.DocumentViewerLoader', [Thing, OtherThi
         domClass.toggle();
         domClass.remove();
         dojoQuery('sdfsdf', dom);
+        dijitFocus.focus(domelement);
+        dojoLang.trim('  sdfsdf   sdf  ');
     }
 });
 return model;

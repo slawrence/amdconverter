@@ -79,5 +79,7 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         dojo.toggleClass();
         dojo.removeClass();
         dojo.query('sdfsdf', dom);
+        dijit.focus(domelement);
+        dojo.trim('  sdfsdf   sdf  ');
     }
 });
