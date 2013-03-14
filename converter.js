@@ -10,7 +10,9 @@ this.CONVERTER = (function () {
         ignore = {
             'PTO.app': true,
             'PTO.config': true,
-            'PTO.log': true
+            'PTO.log': true,
+            'PTO.service': true,
+            'PTO.serviceFactory': true
         },
         shouldIgnore = function (string) {
             var prop;

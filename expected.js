@@ -143,6 +143,8 @@ var model = declare('PTO.widget.document.DocumentViewerLoader', [Thing, OtherThi
         dojoQuery('sdfsdf', dom);
         dijitFocus.focus(domelement);
         dojoLang.trim('  sdfsdf   sdf  ');
+        PTO.service.get('Employee');
+        PTO.serviceFactory.something('');
     }
 });
 return model;

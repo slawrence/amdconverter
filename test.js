@@ -81,5 +81,7 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         dojo.query('sdfsdf', dom);
         dijit.focus(domelement);
         dojo.trim('  sdfsdf   sdf  ');
+        PTO.service.get('Employee');
+        PTO.serviceFactory.something('');
     }
 });
