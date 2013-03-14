@@ -12,7 +12,9 @@ this.CONVERTER = (function () {
             'PTO.config': true,
             'PTO.log': true,
             'PTO.service': true,
-            'PTO.serviceFactory': true
+            'PTO.serviceFactory': true,
+            'PTO.widget.document.getDocumentViewer': true,
+            'PTO.widget.document.markupKey': true
         },
         shouldIgnore = function (string) {
             var prop;
@@ -66,16 +68,20 @@ this.CONVERTER = (function () {
             'dojo/dom-class': 'domClass',
             'dojo/dom-attr': 'domAttr',
             'dojo/dom': 'dojoDom',
+            'dojo/html': 'dojoHtml',
             'dojo/_base/connect': 'dojoConnect',
+            'dojo/cookie': 'cookie',
             'dojo/dom-construct': 'domConstruct',
             'dojo/_base/declare': 'declare',
             'dojo/_base/array': 'dojoArray',
+            'dojo/io/iframe': 'dojoIframe',
             'dojo/_base/lang': 'dojoLang',
             'dojo/keys': 'keys',
             'dojo/_base/event': 'dojoEvent',
             'dojo/dom-style': 'domStyle',
             'dojo/dom-geometry': 'domGeom',
             'dojo/_base/window': 'dojoWindow',
+            'dojo/string': 'dojoString',
             'dijit/registry': 'dijitRegistry',
             'dijit/popup': 'dijitPopup',
             'dijit/focus': 'dijitFocus'
@@ -104,8 +110,17 @@ this.CONVERTER = (function () {
                 depend: 'dojo/dom'
             },
             {
+                pattern: /dojo\.html\.(set)/g,
+                depend: 'dojo/html'
+            },
+            {
                 pattern: /dojo\.(connect)/g,
                 depend: 'dojo/_base/connect'
+            },
+            {
+                pattern: /dojo\._toDom/g,
+                rest: 'toDom',
+                depend: 'dojo/dom-construct'
             },
             {
                 pattern: /dojo\.(create)/g,
@@ -158,6 +173,14 @@ this.CONVERTER = (function () {
                 depend: 'dojo/_base/lang'
             },
             {
+                pattern: /dojo\.(isFunction)/g,
+                depend: 'dojo/_base/lang'
+            },
+            {
+                pattern: /dojo\.cookie()/g,
+                depend: 'dojo/cookie'
+            },
+            {
                 pattern: /dojo\.(place)/g,
                 depend: 'dojo/dom-construct'
             },
@@ -181,6 +204,14 @@ this.CONVERTER = (function () {
             {
                 pattern: /dojo\.(stop)Event/g,
                 depend: 'dojo/_base/event'
+            },
+            {
+                pattern: /dojo\.string\.([\w\.]+)/g,
+                depend: 'dojo/string'
+            },
+            {
+                pattern: /dojo\.io\.iframe\.([\w\.]+)/g,
+                depend: 'dojo/io/iframe'
             },
             {
                 pattern: /dojo\.style/g,
@@ -219,6 +250,10 @@ this.CONVERTER = (function () {
             {
                 pattern: /dojo\.(indexOf)/g,
                 depend: 'dojo/_base/array'
+            },
+            {
+                pattern: /dojo\.(isArray)/g,
+                depend: 'dojo/_base/lang'
             },
             {
                 pattern: /dojo\.(marginBox)/g,
@@ -307,6 +342,22 @@ this.CONVERTER = (function () {
                     warn('Reference to ORE found: ' + all);
                     return all;
                 }
+            },
+            {
+                pattern: /dojo\.[\w\.]+/g,
+                repFn: function (all, rest) {
+                    if (all !== "dojo.declare") { //declare isn't replaced till end
+                        warn('Still references to dojo unreplaced: ' + all);
+                    }
+                    return all;
+                }
+            },
+            {
+                pattern: /dijit\.[\w\.]+/g,
+                repFn: function (all, rest) {
+                    warn('Still references to dijit unreplaced: ' + all);
+                    return all;
+                }
             }
         ];
 
@@ -318,6 +369,9 @@ this.CONVERTER = (function () {
         return string.replace(replacement.pattern, function (all, rest) {
             var argArray, alias, fnReturn;
             if (shouldIgnore(all) || (!replacement.commentAgnostic && inComment) || (!replacement.stringAgnostic && inString)) {
+                if (shouldIgnore(all)) {
+                    warn("Ignoring '" + all + "' because of ignore rule");
+                }
                 return all;
             }
             //apply fn if defined
@@ -338,6 +392,7 @@ this.CONVERTER = (function () {
                 }
             } else {
                 //If an alias was not defined, use default alias based on depend map and regex 'rest' capture
+                rest = replacement.rest || rest;
                 alias = dependNameMap[replacement.depend] + (rest ? "." + rest : "");
                 if (!alias) {
                     console.error("Uh oh. Alias not specified.");

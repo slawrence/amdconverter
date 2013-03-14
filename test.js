@@ -83,5 +83,16 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         dojo.trim('  sdfsdf   sdf  ');
         PTO.service.get('Employee');
         PTO.serviceFactory.something('');
+        dojo.string.substitute("${replace}", { replace: "this" });
+        dojo.string.trim("  sdf sdf ");
+        updatedMetadataNode = dojo._toDom(this._createMetaDataDisplay(prop, value, pinned));
+        dojo.isArray([]);
+        dojo.html.set(selectedTextItem, this.createSelectedMenuText(selection));
+        PTO.widget.document.getDocumentViewerLoader();
+        PTO.widget.document.markupKey.get();
+        dojo.weeeirrd(); //no replacement rule setup, testing warning
+        iframe = dojo.io.iframe.create('printframe', '', 'documentPrint.jsp');
+        dojo.cookie('sdfsf');
+        dojo.isFunction(function () {});
     }
 });

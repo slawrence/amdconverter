@@ -29,14 +29,18 @@ define([
     "dojo/_base/declare",
     "dojo/_base/event",
     "dojo/_base/lang",
+    "dojo/cookie",
     "dojo/dom",
     "dojo/dom-attr",
     "dojo/dom-class",
     "dojo/dom-construct",
     "dojo/dom-geometry",
     "dojo/dom-style",
+    "dojo/html",
+    "dojo/io/iframe",
     "dojo/keys",
-    "dojo/query"
+    "dojo/query",
+    "dojo/string"
 ], function (
     Widget,
     constants,
@@ -65,14 +69,18 @@ define([
     declare,
     dojoEvent,
     dojoLang,
+    cookie,
     dojoDom,
     domAttr,
     domClass,
     domConstruct,
     domGeom,
     domStyle,
+    dojoHtml,
+    dojoIframe,
     keys,
-    dojoQuery
+    dojoQuery,
+    dojoString
 ) {
 var model = declare('PTO.widget.document.DocumentViewerLoader', [Thing, OtherThing], {
     constructor: function () {
@@ -126,7 +134,7 @@ var model = declare('PTO.widget.document.DocumentViewerLoader', [Thing, OtherThi
         Something = {};
         something.getOut();
         document.getOut();
-        document.getDocumentViewerLoader = function () {
+        PTO.widget.document.getDocumentViewerLoader = function () {
             if (!loader) {
                 loader = new PTO.widget.document.DocumentViewerLoader();
             }
@@ -145,6 +153,17 @@ var model = declare('PTO.widget.document.DocumentViewerLoader', [Thing, OtherThi
         dojoLang.trim('  sdfsdf   sdf  ');
         PTO.service.get('Employee');
         PTO.serviceFactory.something('');
+        dojoString.substitute("${replace}", { replace: "this" });
+        dojoString.trim("  sdf sdf ");
+        updatedMetadataNode = domConstruct.toDom(this._createMetaDataDisplay(prop, value, pinned));
+        dojoLang.isArray([]);
+        dojoHtml.set(selectedTextItem, this.createSelectedMenuText(selection));
+PTO.widget.document.getDocumentViewerLoader();
+        PTO.widget.document.markupKey.get();
+        dojo.weeeirrd(); //no replacement rule setup, testing warning
+        iframe = dojoIframe.create('printframe', '', 'documentPrint.jsp');
+        cookie('sdfsf');
+        dojoLang.isFunction(function () {});
     }
 });
 return model;
