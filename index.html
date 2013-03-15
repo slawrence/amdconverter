@@ -11,56 +11,143 @@ del {
 ins {
     background: #E6FFE6;
 }
+div.toggle {
+    cursor: pointer;
+    padding: 5px;
+    text-decoration: underline;
+    background: 33CCCC;
+}
 </style>
 <meta charset=utf-8 />
 </head>
 
 <body>
-<h2>Input:</h2>
-<textarea id="input" rows="30" cols="100"></textarea>
-<div><a id="convert" href="#">Convert</a></div>
-<h2>Converted Output:</h2>
-<div id="output" style="white-space: pre-wrap; font-family: monospace" rows="30" cols="100"></div>
-<h3>Diff with expected.js</h3>
-<div id="diff" style="white-space: pre-wrap; font-family: monospace"></div>
-<h3>Warnings:</h3>
-<ul id="warnings"></ul>
+<h1>Tests</h1>
+<div id="tests"></div>
 
 <script>
-$.ajax({
-    url: './expected.js',
-    type: 'GET',
-    dataType: 'text',
-    success: function (expected) {
-        $.ajax({
-            url: './test.js',
-            type: 'GET',
-            dataType: 'text', //don't execute
-            success: function (initial_data) {
 
-                function run(input) {
-                    var output = CONVERTER.convert(input);
-                        diffResult = diffString(expected, output);
-                    $('#input').text(input);
-                    $('#output').empty().append(output);
-                    $.each(CONVERTER.warnings, function(index, warning) {
-                        $('#warnings').append($('<li/>').text(warning));
+function createOutput($div, name, runFn) {
+    var toggleNext = function (name) {
+        return $('<div/>')
+                    .attr('href', '#')
+                    .attr('class', 'toggle')
+                    .text(name)
+                    .on('click', function () {
+                        $(this).next().toggle();
                     });
-                    if (!diffResult.match(/<ins>|<del>/)) {
-                        diffResult = "No difference between input and expected.js";
-                    }
-                    $('#diff').empty().append(diffResult);
-                }
+    };
 
-                $('#convert').on('click', function () {
-                    run($('#input').val());
-                });
+    $div.append($('<hr/>'));
+    $div.append($('<h2/>')
+        .append(
+            $('<a/>')
+                .attr('href', '#')
+                .on('click', function () {
+                    var input = $div.find('#input').val();
+                    runFn.call($div, input);
+                })
+                .text('run ' + name)
+    ));
+    $div.append($('<div/>')
+        .attr('id', 'summary'));
 
-                run(initial_data);
-            }
-        });
+    $div.append(toggleNext('View Input'));
+    $div.append($('<textarea/>')
+        .attr('id', 'input')
+        .attr('rows', 30)
+        .attr('cols', 100)
+        .hide());
+
+    $div.append(toggleNext('View Output'));
+    $div.append($('<div/>')
+        .attr('id', 'output')
+        .attr('style', 'white-space: pre-wrap; font-family: monospace')
+        .hide());
+
+    $div.append(toggleNext('View Warnings'));
+    $div.append($('<div/>')
+        .attr('id', 'warnings')
+        .hide());
+
+    $div.append(toggleNext('View Diff'));
+    $div.append($('<div/>')
+        .attr('id', 'diff')
+        .attr('style', 'white-space: pre-wrap; font-family: monospace')
+        .hide());
+
+}
+
+function updateHeader() {
+    if (diffsFound) {
+        $('h1').append(' - Test failures!').attr('style', 'color: red');
     }
-});
+}
+
+function test(testDiv, name) {
+    $.ajax({
+        url: './tests/' + name + '/expected.js',
+        type: 'GET',
+        dataType: 'text',
+        success: function (expected) {
+            $.ajax({
+                url: './tests/' + name + '/input.js',
+                type: 'GET',
+                dataType: 'text', //don't execute
+                success: function (initial) {
+                    var div = $('<div/>'),
+                        run = function (input) {
+                            var output = CONVERTER.convert(input),
+                                diffResult = diffString(expected, output),
+                                warnings = CONVERTER.warnings,
+                                summary = "",
+                                elements = this;
+
+                            elements.find('#input').text(input);
+                            elements.find('#output').empty().append(output);
+                            elements.find('#warnings').empty();
+                            $.each(warnings, function(index, warning) {
+                                elements.find('#warnings').append($('<li/>').text(warning));
+                            });
+                            if (!diffResult.match(/<ins>|<del>/)) {
+                                summary = "No diffs.";
+                                diffResult = "No difference between input and expected.js";
+                            } else {
+                                diffsFound = true;
+                                summary = "Differences found.";
+                                elements.find('#summary').attr('style', 'color: red');
+                            }
+                            elements.find('#diff').empty().append(diffResult);
+                            if (warnings.length > 0) {
+                                summary += "  Warnings present";
+                            }
+                            elements.find('#summary').empty().text(summary);
+                            updateHeader();
+                        }
+
+                    createOutput(div, name, run);
+                    run.call(div, initial);
+                    testDiv.append(div);
+                }
+            });
+        }
+    });
+}
+
+function runTests() {
+    $testDiv = $('#tests');
+    $testDiv.empty();
+    $.ajax({
+        type: 'GET',
+        url: 'testNames.json',
+        success: function (testNames) {
+            test($testDiv, 'basic');
+        }
+    });
+}
+
+var diffsFound = false;
+runTests();
 </script>
 
 </body>

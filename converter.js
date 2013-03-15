@@ -530,9 +530,14 @@ this.CONVERTER = (function () {
      */
     function convertDeclare(string) {
         var declarePattern = /dojo\.declare\((?:(?:'|")([\w\.]+)(?:'|"),)?\s*(null|[\w\.]+|\[[\w\.\s,]*\])([\S\s]*)\}\);/g;
+
+        //add tabbing
+        string = string.replace(/(\r\n?|\n)/g, function (all, match) {
+            return match + "    ";
+        });
         return string.replace(declarePattern, function (all, className, parents, rest) {
             var newDeclare = "declare('" + className + "', " + parents + rest;
-            newDeclare = defineString(dependencies) + "var model = " + newDeclare + "\n});\nreturn model;\n});";
+            newDeclare = defineString(dependencies) + "return " + newDeclare + "\n    });\n});";
             return newDeclare;
         });
     }
