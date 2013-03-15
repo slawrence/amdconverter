@@ -20,6 +20,14 @@ Optional: Link converter.js to the converter.js on the projects svn trunk so cha
 
 * `ln converter.js /your/svn/trunk/node/location/converter.js`
 
+## Scripts
+
+Change path to node folder inside each script before using. Probably a better way to use node and globally install the node convertToAMD script, but nonetheless these scripts work.
+
+* `convertFolder` will convert all js files that do not have AMD signatures in the current folder
+* `convert file.js` will convert a single file
+* Use `-O` option to overwrite the file.
+
 ## Add a test
 
 * Add test name to `testNames.json` in root dir
