@@ -2,9 +2,10 @@
  * @class PTO.something.TheClass
  */
 define([
+    "dojo/_base/declare",
     "../../Widget",
     "../../constants",
-    "../../dialog",
+    "../../dialog/constants",
     "../../formatters",
     "../../gadget",
     "../../lang",
@@ -26,7 +27,6 @@ define([
     "dijit/registry",
     "dijit/widget/thingy/Form",
     "dojo/_base/array",
-    "dojo/_base/declare",
     "dojo/_base/event",
     "dojo/_base/lang",
     "dojo/cookie",
@@ -42,9 +42,10 @@ define([
     "dojo/query",
     "dojo/string"
 ], function (
+    declare,
     Widget,
     constants,
-    dialog,
+    dialogConstants,
     formatters,
     gadget,
     lang,
@@ -66,7 +67,6 @@ define([
     dijitRegistry,
     dijitForm,
     dojoArray,
-    declare,
     dojoEvent,
     dojoLang,
     cookie,
@@ -114,7 +114,7 @@ define([
             lang.thisShouldGenerateAWarning();
             new dijitButton({});
             new dijitForm();
-            dialog.CONSTANT = 5;
+            dialogConstants.CONSTANT = 5;
             var x = new ConstructorProperty();
             dijitRegistry.someMethod();
             dijitRegistry.byId('id');
@@ -164,6 +164,15 @@ define([
             iframe = dojoIframe.create('printframe', '', 'documentPrint.jsp');
             cookie('sdfsf');
             dojoLang.isFunction(function () {});
-        }
+            declare.safeMixin({}, {});
+            domClass.contains('sdfsdf');
+            domClass.replace('sdfsf');
+            dijitRegistry.getEnclosingWidget();
+            dialogConstants.BTN_CANCEL;
+            dialogConstants.BTN_CANCEL.somethingelse;
+        },
+
+        templateString: 'something data-dojo-attach-point="pinnedDataNodeCenter">/something' +
+            'asdfasdfdsf data-dojo-type' + 'data-dojo-attach-event';
     });
 });

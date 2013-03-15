@@ -94,5 +94,14 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         iframe = dojo.io.iframe.create('printframe', '', 'documentPrint.jsp');
         dojo.cookie('sdfsf');
         dojo.isFunction(function () {});
-    }
+        dojo.safeMixin({}, {});
+        dojo.hasClass('sdfsdf');
+        dojo.replaceClass('sdfsf');
+        dijit.getEnclosingWidget();
+        PTO.dialog.BTN_CANCEL;
+        PTO.dialog.BTN_CANCEL.somethingelse;
+    },
+
+    templateString: 'something dojoAttachPoint="pinnedDataNodeCenter">/something' +
+        'asdfasdfdsf dojoType' + 'dojoAttachEvent';
 });

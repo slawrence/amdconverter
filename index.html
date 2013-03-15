@@ -11,11 +11,26 @@ del {
 ins {
     background: #E6FFE6;
 }
+h2 {
+    margin: 0px;
+    padding: 3px;
+}
 div.toggle {
     cursor: pointer;
-    padding: 5px;
-    text-decoration: underline;
-    background: 33CCCC;
+    padding: 3px;
+    font-size: 75%;
+    border-width: 1px;
+    border-style: dotted;
+    background: #CCFFCC;
+    padding-bottom: 5px;
+}
+div.toggle > span {
+    float: right;
+}
+div#summary {
+    text-align: center;
+    font-size: 125%;
+    padding: 3px;
 }
 </style>
 <meta charset=utf-8 />
@@ -31,10 +46,13 @@ function createOutput($div, name, runFn) {
     var toggleNext = function (name) {
         return $('<div/>')
                     .attr('href', '#')
-                    .attr('class', 'toggle')
                     .text(name)
+                    .append($('<span/>').text("+"))
+                    .attr('class', 'toggle')
                     .on('click', function () {
-                        $(this).next().toggle();
+                        var $span = $(this).find('span');
+                        $span.text($span.text() === "+" ? "-" : "+");
+                        $(this).next().toggle('fast');
                     });
     };
 
@@ -79,8 +97,9 @@ function createOutput($div, name, runFn) {
 }
 
 function updateHeader() {
-    if (diffsFound) {
+    if (!diffsFound) {
         $('h1').append(' - Test failures!').attr('style', 'color: red');
+        diffsFound = true;
     }
 }
 
@@ -113,16 +132,15 @@ function test(testDiv, name) {
                                 summary = "No diffs.";
                                 diffResult = "No difference between input and expected.js";
                             } else {
-                                diffsFound = true;
                                 summary = "Differences found.";
                                 elements.find('#summary').attr('style', 'color: red');
+                                updateHeader();
                             }
                             elements.find('#diff').empty().append(diffResult);
                             if (warnings.length > 0) {
-                                summary += "  Warnings present";
+                                summary += "  Warnings present.";
                             }
                             elements.find('#summary').empty().text(summary);
-                            updateHeader();
                         }
 
                     createOutput(div, name, run);
@@ -140,8 +158,11 @@ function runTests() {
     $.ajax({
         type: 'GET',
         url: 'testNames.json',
+        dataType: 'json',
         success: function (testNames) {
-            test($testDiv, 'basic');
+            $.each(testNames.tests, function (i, name) {
+                test($testDiv, name);
+            })
         }
     });
 }

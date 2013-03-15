@@ -91,6 +91,27 @@ this.CONVERTER = (function () {
          */
         replacements = [
             {
+                pattern: /dojoAttachPoint/g,
+                stringAgnostic: true,
+                repFn: function (all) {
+                    return 'data-dojo-attach-point';
+                }
+            },
+            {
+                pattern: /dojoType/g,
+                stringAgnostic: true,
+                repFn: function (all) {
+                    return 'data-dojo-type';
+                }
+            },
+            {
+                pattern: /dojoAttachEvent/g,
+                stringAgnostic: true,
+                repFn: function (all) {
+                    return 'data-dojo-attach-event';
+                }
+            },
+            {
                 pattern: /dojo\.(add)Class/g,
                 depend: 'dojo/dom-class'
             },
@@ -141,6 +162,14 @@ this.CONVERTER = (function () {
                 depend: 'dojo/dom-construct'
             },
             {
+                pattern: /dojo\.(safeMixin)/g,
+                depend: 'dojo/_base/declare'
+            },
+            {
+                pattern: /dojo\.(filter)/g,
+                depend: 'dojo/_base/array'
+            },
+            {
                 pattern: /dojo\.(disconnect)/g,
                 depend: 'dojo/_base/connect'
             },
@@ -153,7 +182,8 @@ this.CONVERTER = (function () {
                 depend: 'dojo/_base/array'
             },
             {
-                pattern: /dojo\.(hasClass)/g,
+                pattern: /dojo\.hasClass/g,
+                rest: 'contains',
                 depend: 'dojo/dom-class'
             },
             {
@@ -194,7 +224,7 @@ this.CONVERTER = (function () {
                 depend: 'dojo/dom-class'
             },
             {
-                pattern: /dojo\.(replaceClass)/g,
+                pattern: /dojo\.(replace)Class/g,
                 depend: 'dojo/dom-class'
             },
             {
@@ -264,6 +294,10 @@ this.CONVERTER = (function () {
                 depend: 'dojo/dom-geometry'
             },
             {
+                pattern: /dijit\.(getEnclosingWidget)/g,
+                depend: 'dijit/registry'
+            },
+            {
                 pattern: /dijit\.popup\.([\w\.]*)/g,
                 depend: 'dijit/popup'
             },
@@ -296,6 +330,13 @@ this.CONVERTER = (function () {
                         last = pieces[pieces.length - 1];
                     this.alias = "dijit" + last;
                     this.depend = all.replace(/\./g, "/");
+                }
+            },
+            {
+                pattern: /PTO\.dialog\.([A-Z_]+[\w\.]*)/g,
+                repFn: function (all, rest) {
+                    this.alias = 'dialogConstants.' + rest;
+                    this.depend = toRelativePath('PTO.dialog.constants', currentPath);
                 }
             },
             {
@@ -504,6 +545,12 @@ this.CONVERTER = (function () {
         }
         cnt = array.length;
         array.sort(function (a, b) {
+            if (a.depend === 'dojo/_base/declare') {
+                return -1;
+            }
+            if (b.depend === 'dojo/_base/declare') {
+                return 1;
+            }
             if (a.depend < b.depend) {
                 return -1;
             }
@@ -531,13 +578,14 @@ this.CONVERTER = (function () {
     function convertDeclare(string) {
         var declarePattern = /dojo\.declare\((?:(?:'|")([\w\.]+)(?:'|"),)?\s*(null|[\w\.]+|\[[\w\.\s,]*\])([\S\s]*)\}\);/g;
 
-        //add tabbing
-        string = string.replace(/(\r\n?|\n)/g, function (all, match) {
-            return match + "    ";
-        });
         return string.replace(declarePattern, function (all, className, parents, rest) {
-            var newDeclare = "declare('" + className + "', " + parents + rest;
-            newDeclare = defineString(dependencies) + "return " + newDeclare + "\n    });\n});";
+            var newDeclare;
+            //add tabbing
+            rest = rest.replace(/(\r\n?|\n)/g, function (all, match) {
+                return match + "    ";
+            });
+            newDeclare = "declare('" + className + "', " + parents + rest;
+            newDeclare = defineString(dependencies) + "    return " + newDeclare + "\n    });\n});";
             return newDeclare;
         });
     }
