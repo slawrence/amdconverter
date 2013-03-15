@@ -12,6 +12,7 @@ ins {
     background: #E6FFE6;
 }
 h2 {
+    text-align: center;
     margin: 0px;
     padding: 3px;
 }
@@ -65,19 +66,18 @@ function createOutput($div, name, runFn) {
                     var input = $div.find('#input').val();
                     runFn.call($div, input);
                 })
-                .text('run ' + name)
+                .text('click to run: ' + name)
     ));
     $div.append($('<div/>')
         .attr('id', 'summary'));
 
-    $div.append(toggleNext('View Input'));
+    $div.append($('<div/>').text('Input'));
     $div.append($('<textarea/>')
         .attr('id', 'input')
-        .attr('rows', 30)
-        .attr('cols', 100)
-        .hide());
+        .attr('rows', 20)
+        .attr('cols', 100));
 
-    $div.append(toggleNext('View Output'));
+    $div.append(toggleNext('View Converted Output'));
     $div.append($('<div/>')
         .attr('id', 'output')
         .attr('style', 'white-space: pre-wrap; font-family: monospace')
