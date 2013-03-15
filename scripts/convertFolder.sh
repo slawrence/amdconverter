@@ -1,5 +1,5 @@
 #! /bin/bash
-declare nodeFolder=c:/dev/svn/pe2e.trunk/pe2e/pe2e-web/webapp/src/main/node
+declare nodeFolder=c:/dev/svn/path/to/node/folder
 
 declare overwrite=false
 declare msg="The previous files will be converted. "
