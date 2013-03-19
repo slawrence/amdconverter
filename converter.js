@@ -10,7 +10,6 @@ this.CONVERTER = (function () {
         ignore = {
             'PTO.app': true,
             'PTO.config': true,
-            'PTO.log': true,
             'PTO.service': true,
             'PTO.serviceFactory': true,
             'PTO.widget.document.getDocumentViewer': true,
@@ -82,6 +81,8 @@ this.CONVERTER = (function () {
             'dojo/dom-geometry': 'domGeom',
             'dojo/_base/window': 'dojoWindow',
             'dojo/string': 'dojoString',
+            'dojo/ready': 'ready',
+            'dojo/has': 'has',
             'dijit/registry': 'dijitRegistry',
             'dijit/popup': 'dijitPopup',
             'dijit/focus': 'dijitFocus'
@@ -118,6 +119,18 @@ this.CONVERTER = (function () {
             {
                 pattern: /dojo\.(trim)/g,
                 depend: 'dojo/_base/lang'
+            },
+            {
+                pattern: /dojo\.(isString)/g,
+                depend: 'dojo/_base/lang'
+            },
+            {
+                pattern: /dojo\.isIE/g,
+                depend: 'dojo/has',
+                repFn: function (all) {
+                    addDependency(this.depend, dependNameMap[this.depend]);
+                    return "has('ie')";
+                }
             },
             {
                 pattern: /dojo\.(attr)/g,
@@ -244,6 +257,15 @@ this.CONVERTER = (function () {
                 depend: 'dojo/io/iframe'
             },
             {
+                pattern: /dojo\.(getComputedStyle)/g,
+                depend: 'dojo/dom-style'
+            },
+            {
+                pattern: /dojo\.\_toPixelValue/g,
+                rest: 'toPixelValues',
+                depend: 'dojo/dom-style'
+            },
+            {
                 pattern: /dojo\.style/g,
                 depend: 'dojo/dom-style',
                 alias: 'domStyle.set',
@@ -266,11 +288,35 @@ this.CONVERTER = (function () {
                 depend: 'dojo/_base/window'
             },
             {
+                pattern: /dojo\.(body)/g,
+                depend: 'dojo/_base/window'
+            },
+            {
+                pattern: /dojo\.(doc)/g,
+                depend: 'dojo/_base/window'
+            },
+            {
                 pattern: /dojo\.(clone)/g,
                 depend: 'dojo/_base/lang'
             },
             {
+                pattern: /dojo\.ready()/g,
+                depend: 'dojo/ready'
+            },
+            {
                 pattern: /dojo\.(contentBox)/g,
+                depend: 'dojo/dom-geometry'
+            },
+            {
+                pattern: /dojo\.\_(getBorderExtents)/g,
+                depend: 'dojo/dom-geometry'
+            },
+            {
+                pattern: /dojo\.\_(getMarginExtents)/g,
+                depend: 'dojo/dom-geometry'
+            },
+            {
+                pattern: /dojo\.\_(getPadExtents)/g,
                 depend: 'dojo/dom-geometry'
             },
             {
@@ -344,6 +390,13 @@ this.CONVERTER = (function () {
                 repFn: function (all, rest) {
                     this.alias = 'constants.' + rest;
                     this.depend = toRelativePath('PTO.constants', currentPath);
+                }
+            },
+            {
+                pattern: /PTO\.log([\w\.]*)/g,
+                repFn: function (all, rest) {
+                    this.alias = 'log' + rest;
+                    this.depend = toRelativePath('PTO.logging.Logger', currentPath);
                 }
             },
             {
@@ -470,7 +523,7 @@ this.CONVERTER = (function () {
                     currentComment = undefined;
                 }
             } else {
-                if (piece === "/*" || piece === "//") {
+                if (!inString && (piece === "/*" || piece === "//")) {
                     currentComment = piece;
                 }
             }
@@ -576,7 +629,7 @@ this.CONVERTER = (function () {
      * NOTE: We can only convert files that have one declare statement!
      */
     function convertDeclare(string) {
-        var declarePattern = /dojo\.declare\((?:(?:'|")([\w\.]+)(?:'|"),)?\s*(null|[\w\.]+|\[[\w\.\s,]*\])([\S\s]*)\}\);/g;
+        var declarePattern = /dojo\.declare\((?:(?:'|")([\w\.]+)(?:'|"),)?\s*(null|[\w\.\_]+|\[[\w\.\_\s,]*\])([\S\s]*)\}\);/g;
 
         return string.replace(declarePattern, function (all, className, parents, rest) {
             var newDeclare;

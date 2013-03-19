@@ -1,5 +1,6 @@
 {
     "tests": [
-        "basic"
+        "basic",
+        "url"
     ]
 }

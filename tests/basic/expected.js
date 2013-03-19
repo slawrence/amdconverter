@@ -9,6 +9,7 @@ define([
     "../../formatters",
     "../../gadget",
     "../../lang",
+    "../../logging/Logger",
     "../../schema/services/ClaimService",
     "../../schema/services/ClaimSetService",
     "../../schema/services/SearchService",
@@ -29,6 +30,7 @@ define([
     "dojo/_base/array",
     "dojo/_base/event",
     "dojo/_base/lang",
+    "dojo/_base/window",
     "dojo/cookie",
     "dojo/dom",
     "dojo/dom-attr",
@@ -36,10 +38,12 @@ define([
     "dojo/dom-construct",
     "dojo/dom-geometry",
     "dojo/dom-style",
+    "dojo/has",
     "dojo/html",
     "dojo/io/iframe",
     "dojo/keys",
     "dojo/query",
+    "dojo/ready",
     "dojo/string"
 ], function (
     declare,
@@ -49,6 +53,7 @@ define([
     formatters,
     gadget,
     lang,
+    log,
     ClaimService,
     ClaimSetService,
     SearchService,
@@ -69,6 +74,7 @@ define([
     dojoArray,
     dojoEvent,
     dojoLang,
+    dojoWindow,
     cookie,
     dojoDom,
     domAttr,
@@ -76,10 +82,12 @@ define([
     domConstruct,
     domGeom,
     domStyle,
+    has,
     dojoHtml,
     dojoIframe,
     keys,
     dojoQuery,
+    ready,
     dojoString
 ) {
     return declare('PTO.widget.document.DocumentViewerLoader', [Thing, OtherThing], {
@@ -91,6 +99,8 @@ define([
             dojoLang.hitch({}, function (this.toString()));
         },
 
+        svgNS: "http://www.w3.org/2000/svg",
+
         aMethod: function () {
             /**
              * Don't add this PTO.testing.framework.widget
@@ -99,7 +109,7 @@ define([
              */
             // /* hello */ /* //'" /* \ndojo.elephant(); PTO.testing.somewhere.over
             gadget.class('PTO.GoGo.Gadget');
-            PTO.log.debug('This should be ignored');
+            log.debug('This shouldnt be ignored');
             domClass.add('class');
             domAttr.attr('aria');
             dojoDom.byId('someId');
@@ -170,6 +180,18 @@ define([
             dijitRegistry.getEnclosingWidget();
             dialogConstants.BTN_CANCEL;
             dialogConstants.BTN_CANCEL.somethingelse;
+            log('This is a logging statement');
+
+            dojoLang.isString('sdfsdf');
+            has('ie');
+            domGeom.getBorderExtents();
+            ready();
+            dojoWindow.body();
+            domStyle.getComputedStyle();
+            dojoWindow.doc();
+            domStyle.toPixelValues();
+            domGeom.getMarginExtents();
+            domGeom.getPadExtents();
         },
 
         templateString: 'something data-dojo-attach-point="pinnedDataNodeCenter">/something' +

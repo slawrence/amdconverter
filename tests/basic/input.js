@@ -21,6 +21,8 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         dojo.hitch({}, function (this.toString()));
     },
 
+    svgNS: "http://www.w3.org/2000/svg",
+
     aMethod: function () {
         /**
          * Don't add this PTO.testing.framework.widget
@@ -29,7 +31,7 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
          */
         // /* hello */ /* //'" /* \ndojo.elephant(); PTO.testing.somewhere.over
         PTO.gadget.class('PTO.GoGo.Gadget');
-        PTO.log.debug('This should be ignored');
+        PTO.log.debug('This shouldnt be ignored');
         dojo.addClass('class');
         dojo.attr('aria');
         dojo.byId('someId');
@@ -100,6 +102,18 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         dijit.getEnclosingWidget();
         PTO.dialog.BTN_CANCEL;
         PTO.dialog.BTN_CANCEL.somethingelse;
+        PTO.log('This is a logging statement');
+
+        dojo.isString('sdfsdf');
+        dojo.isIE;
+        dojo._getBorderExtents();
+        dojo.ready();
+        dojo.body();
+        dojo.getComputedStyle();
+        dojo.doc();
+        dojo._toPixelValue();
+        dojo._getMarginExtents();
+        dojo._getPadExtents();
     },
 
     templateString: 'something dojoAttachPoint="pinnedDataNodeCenter">/something' +
