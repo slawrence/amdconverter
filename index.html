@@ -71,11 +71,12 @@ function createOutput($div, name, runFn) {
     $div.append($('<div/>')
         .attr('id', 'summary'));
 
-    $div.append($('<div/>').text('Input'));
+    $div.append(toggleNext('Input'));
     $div.append($('<textarea/>')
         .attr('id', 'input')
         .attr('rows', 20)
-        .attr('cols', 100));
+        .attr('cols', 100)
+        .hide());
 
     $div.append(toggleNext('View Converted Output'));
     $div.append($('<div/>')
