@@ -10,6 +10,7 @@ this.CONVERTER = (function () {
         ignore = {
             'PTO.app': true,
             'PTO.config': true,
+            'PTO.log': true,
             'PTO.service': true,
             'PTO.serviceFactory': true,
             'PTO.widget.document.getDocumentViewer': true,
@@ -83,9 +84,11 @@ this.CONVERTER = (function () {
             'dojo/string': 'dojoString',
             'dojo/ready': 'ready',
             'dojo/has': 'has',
+            'dojo/Stateful': 'Stateful',
             'dijit/registry': 'dijitRegistry',
             'dijit/popup': 'dijitPopup',
-            'dijit/focus': 'dijitFocus'
+            'dijit/focus': 'dijitFocus',
+            'dijit/layout/utils': 'dijitLayoutUtils'
         },
         /**
          * NOTE: Order matters! Each runs one after the other
@@ -128,6 +131,7 @@ this.CONVERTER = (function () {
                 pattern: /dojo\.isIE/g,
                 depend: 'dojo/has',
                 repFn: function (all) {
+                    warn('dojo.IsIE detected - replaced with has("ie"). Please double check the replacement for cases where a specific version of IE needed to be detected');
                     addDependency(this.depend, dependNameMap[this.depend]);
                     return "has('ie')";
                 }
@@ -142,6 +146,10 @@ this.CONVERTER = (function () {
             {
                 pattern: /dojo\.(byId)/g,
                 depend: 'dojo/dom'
+            },
+            {
+                pattern: /dojo\.Stateful()/g,
+                depend: 'dojo/Stateful'
             },
             {
                 pattern: /dojo\.html\.(set)/g,
@@ -367,6 +375,14 @@ this.CONVERTER = (function () {
             {
                 pattern: /dijit\.(focus)/g,
                 depend: 'dijit/focus'
+            },
+            {
+                pattern: /dijit\.layout\.(layoutChildren)/g,
+                depend: 'dijit/layout/utils'
+            },
+            {
+                pattern: /dijit\.layout\.(marginBox2contentBox)/g,
+                depend: 'dijit/layout/utils'
             },
             {
                 pattern: /dijit\.([\w\.]+)/g,

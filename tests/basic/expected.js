@@ -9,7 +9,6 @@ define([
     "../../formatters",
     "../../gadget",
     "../../lang",
-    "../../logging/Logger",
     "../../schema/services/ClaimService",
     "../../schema/services/ClaimSetService",
     "../../schema/services/SearchService",
@@ -23,10 +22,12 @@ define([
     "./something",
     "dijit/focus",
     "dijit/form/Button",
+    "dijit/layout/utils",
     "dijit/place",
     "dijit/popup",
     "dijit/registry",
     "dijit/widget/thingy/Form",
+    "dojo/Stateful",
     "dojo/_base/array",
     "dojo/_base/event",
     "dojo/_base/lang",
@@ -53,7 +54,6 @@ define([
     formatters,
     gadget,
     lang,
-    log,
     ClaimService,
     ClaimSetService,
     SearchService,
@@ -67,10 +67,12 @@ define([
     something,
     dijitFocus,
     dijitButton,
+    dijitLayoutUtils,
     dijitPlace,
     dijitPopup,
     dijitRegistry,
     dijitForm,
+    Stateful,
     dojoArray,
     dojoEvent,
     dojoLang,
@@ -109,7 +111,7 @@ define([
              */
             // /* hello */ /* //'" /* \ndojo.elephant(); PTO.testing.somewhere.over
             gadget.class('PTO.GoGo.Gadget');
-            log.debug('This shouldnt be ignored');
+            PTO.log.debug('This shouldnt be ignored');
             domClass.add('class');
             domAttr.attr('aria');
             dojoDom.byId('someId');
@@ -180,7 +182,7 @@ define([
             dijitRegistry.getEnclosingWidget();
             dialogConstants.BTN_CANCEL;
             dialogConstants.BTN_CANCEL.somethingelse;
-            log('This is a logging statement');
+            PTO.log('This is a logging statement');
 
             dojoLang.isString('sdfsdf');
             has('ie');
@@ -192,6 +194,11 @@ define([
             domStyle.toPixelValues();
             domGeom.getMarginExtents();
             domGeom.getPadExtents();
+
+            dijitLayoutUtils.layoutChildren();
+            dijitLayoutUtils.marginBox2contentBox();
+
+            new Stateful();
         },
 
         templateString: 'something data-dojo-attach-point="pinnedDataNodeCenter">/something' +

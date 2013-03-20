@@ -51,7 +51,10 @@ function createOutput($div, name, runFn) {
                     .append($('<span/>').text("+"))
                     .attr('class', 'toggle')
                     .on('click', function () {
-                        var $span = $(this).find('span');
+                        var $span = $(this).find('span'),
+                            ids = ['input', 'output', 'warnings', 'diff'],
+                            nextId = $(this).next().attr('id');
+
                         $span.text($span.text() === "+" ? "-" : "+");
                         $(this).next().toggle('fast');
                     });

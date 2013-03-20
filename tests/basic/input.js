@@ -114,6 +114,11 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         dojo._toPixelValue();
         dojo._getMarginExtents();
         dojo._getPadExtents();
+
+        dijit.layout.layoutChildren();
+        dijit.layout.marginBox2contentBox();
+
+        new dojo.Stateful();
     },
 
     templateString: 'something dojoAttachPoint="pinnedDataNodeCenter">/something' +
