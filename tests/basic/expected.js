@@ -20,6 +20,7 @@ define([
     "../document",
     "./Something",
     "./something",
+    "dijit/Tooltip",
     "dijit/focus",
     "dijit/form/Button",
     "dijit/layout/utils",
@@ -65,6 +66,7 @@ define([
     document,
     Something,
     something,
+    DijitTooltip,
     dijitFocus,
     dijitButton,
     dijitLayoutUtils,
@@ -197,6 +199,14 @@ define([
 
             dijitLayoutUtils.layoutChildren();
             dijitLayoutUtils.marginBox2contentBox();
+
+            ORE.NoAbstractMethodImplError();
+            PTO.store.get("ObjectStore");
+            DijitTooltip.show();
+            DijitTooltip.hide();
+            DijitTooltip({
+                config: {}
+            });
 
             new Stateful();
         },

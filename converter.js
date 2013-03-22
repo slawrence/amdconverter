@@ -12,6 +12,7 @@ this.CONVERTER = (function () {
             'PTO.config': true,
             'PTO.log': true,
             'PTO.service': true,
+            'PTO.store': true,
             'PTO.serviceFactory': true,
             'PTO.widget.document.getDocumentViewer': true,
             'PTO.widget.document.markupKey': true
@@ -88,7 +89,8 @@ this.CONVERTER = (function () {
             'dijit/registry': 'dijitRegistry',
             'dijit/popup': 'dijitPopup',
             'dijit/focus': 'dijitFocus',
-            'dijit/layout/utils': 'dijitLayoutUtils'
+            'dijit/layout/utils': 'dijitLayoutUtils',
+            'dijit/Tooltip': 'DijitTooltip'
         },
         /**
          * NOTE: Order matters! Each runs one after the other
@@ -377,6 +379,18 @@ this.CONVERTER = (function () {
                 depend: 'dijit/focus'
             },
             {
+                pattern: /dijit\.(show)Tooltip/g,
+                depend: 'dijit/Tooltip'
+            },
+            {
+                pattern: /dijit\.(hide)Tooltip/g,
+                depend: 'dijit/Tooltip'
+            },
+            {
+                pattern: /dijit\.Tooltip()/g,
+                depend: 'dijit/Tooltip'
+            },
+            {
                 pattern: /dijit\.layout\.(layoutChildren)/g,
                 depend: 'dijit/layout/utils'
             },
@@ -446,6 +460,15 @@ this.CONVERTER = (function () {
                     }
                 }
             },
+            /*
+            {
+                pattern: /ORE\.([\w\.]+Error)/g,
+                repFn: function (all, rest) {
+                    this.alias = 'errors.' + rest;
+                    this.depend = toRelativePath('PTO.errors', currentPath);
+                }
+            },
+           */
             {
                 pattern: /ORE\.([\w\.]+)/g,
                 repFn: function (all, rest) {
@@ -573,18 +596,23 @@ this.CONVERTER = (function () {
      */
     function convertRequires(string, path) {
         var providePattern = /dojo\.provide\((?:'|")[\w\.]+(?:'|")\);/g,
-            requirePattern = /dojo\.require\((?:'|")([\w\.]+)(?:'|")\);/g;
+            requirePattern = /dojo\.require\((?:'|")([\w\.]+)(?:'|")\);/g,
+            addDependencyIfMatch = function (matchedString, ns, regex) {
+                var match = matchedString.match(regex),
+                    alias;
+                if (match) {
+                    alias = match[1];
+                    addDependency(toRelativePath(matchedString, path), alias);
+                }
+                return "";
+            };
+
         //replace provide
         string = string.replace(providePattern, "");
 
-        //replace requires, add dependency
+        //replace requires, add dependency for any services found in schema/services or schema/channels
         string = string.replace(requirePattern, function (all, ns) {
-            var match = ns.match(/PTO\.schema\.services\.([\w\.]+)/),
-                alias;
-            if (match) {
-                alias = match[1];
-                addDependency(toRelativePath("PTO.schema.services", path) + "/" + alias, alias);
-            }
+            addDependencyIfMatch(ns, "PTO.schema.services", /PTO\.schema\.services[\w\.]*\.([\w]+$)/);
             return "";
         });
 

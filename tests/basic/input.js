@@ -6,6 +6,9 @@ dojo.require('PTO.formatters');
 dojo.require('PTO.widget');
 dojo.require('PTO.schema.services.ClaimService');
 dojo.require('PTO.schema.services.SearchService');
+dojo.require('PTO.schema.channels.SomeChannel');
+dojo.require('PTO.schema.channels.here.AnotherChannel');
+dojo.require('PTO.schema.whatever.here');
 dojo.require('PTO.schema.services.ClaimSetService');
 
 /**
@@ -117,6 +120,14 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
 
         dijit.layout.layoutChildren();
         dijit.layout.marginBox2contentBox();
+
+        ORE.NoAbstractMethodImplError();
+        PTO.store.get("ObjectStore");
+        dijit.showTooltip();
+        dijit.hideTooltip();
+        dijit.Tooltip({
+            config: {}
+        });
 
         new dojo.Stateful();
     },
