@@ -10,7 +10,6 @@ this.CONVERTER = (function () {
         ignore = {
             'PTO.app': true,
             'PTO.config': true,
-            'PTO.log': true,
             'PTO.service': true,
             'PTO.store': true,
             'PTO.serviceFactory': true,
@@ -426,7 +425,7 @@ this.CONVERTER = (function () {
                 pattern: /PTO\.log([\w\.]*)/g,
                 repFn: function (all, rest) {
                     this.alias = 'log' + rest;
-                    this.depend = toRelativePath('PTO.logging.Logger', currentPath);
+                    this.depend = 'plugin/ioc!' + toRelativePath('PTO.logging.Logger', currentPath);
                 }
             },
             {

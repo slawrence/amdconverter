@@ -46,7 +46,8 @@ define([
     "dojo/keys",
     "dojo/query",
     "dojo/ready",
-    "dojo/string"
+    "dojo/string",
+    "plugin/ioc!../../logging/Logger"
 ], function (
     declare,
     Widget,
@@ -92,7 +93,8 @@ define([
     keys,
     dojoQuery,
     ready,
-    dojoString
+    dojoString,
+    log
 ) {
     return declare('PTO.widget.document.DocumentViewerLoader', [Thing, OtherThing], {
         constructor: function () {
@@ -113,7 +115,7 @@ define([
              */
             // /* hello */ /* //'" /* \ndojo.elephant(); PTO.testing.somewhere.over
             gadget.class('PTO.GoGo.Gadget');
-            PTO.log.debug('This shouldnt be ignored');
+            log.debug('This shouldnt be ignored');
             domClass.add('class');
             domAttr.attr('aria');
             dojoDom.byId('someId');
@@ -184,7 +186,7 @@ define([
             dijitRegistry.getEnclosingWidget();
             dialogConstants.BTN_CANCEL;
             dialogConstants.BTN_CANCEL.somethingelse;
-            PTO.log('This is a logging statement');
+            log('This is a logging statement');
 
             dojoLang.isString('sdfsdf');
             has('ie');
