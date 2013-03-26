@@ -7,6 +7,11 @@ this.CONVERTER = (function () {
         warn = function (message) {
             warnings.push(message);
         },
+        warnOnce = function (message) {
+            if (warnings.indexOf(message) <= -1) {
+                warn(message);
+            }
+        },
         ignore = {
             'PTO.app': true,
             'PTO.config': true,
@@ -133,16 +138,10 @@ this.CONVERTER = (function () {
             {
                 pattern: /dojo\.(getObject)/g,
                 depend: 'dojo/_base/lang',
-                repFn: (function (all) {
-                    var alreadyWarned = false;
-                    return function () {
-                        if (!alreadyWarned) {
-                            warn('WARNING: All instances of dojo.getObject replaced with dojoLang.getObject. However, getObject ' + 
-                                'relies on globals - refactor to make dojo.getObject unnecessary');
-                        }
-                        alreadyWarned = true;
-                    };
-                }())
+                repFn: function (all) {
+                    warnOnce('WARNING: All instances of dojo.getObject replaced with dojoLang.getObject. However, getObject ' +
+                        'relies on globals - refactor to make dojo.getObject unnecessary');
+                }
             },
             {
                 pattern: /dojo\.isIE/g,
@@ -152,7 +151,8 @@ this.CONVERTER = (function () {
                     addDependency(this.depend, dependNameMap[this.depend]);
                     return "has('ie')";
                 }
-            },{
+            },
+            {
                 pattern: /dojo\.isWebKit/g,
                 depend: 'dojo/has',
                 repFn: function (all) {
@@ -313,15 +313,9 @@ this.CONVERTER = (function () {
                 pattern: /dojo\.style/g,
                 depend: 'dojo/dom-style',
                 alias: 'domStyle.set',
-                repFn: (function (all) {
-                    var alreadyWarned = false;
-                    return function () {
-                        if (!alreadyWarned) {
-                            warn('WARNING - This file contains references to dojo.style. All instances were replaced by domStyle.set. You need to check to make sure that domStyle.get was not actually needed in the case only two arguments.');
-                            alreadyWarned = true;
-                        }
-                    };
-                }())
+                repFn: function (all) {
+                    warnOnce('WARNING - This file contains references to dojo.style. All instances were replaced by domStyle.set. You need to check to make sure that domStyle.get was not actually needed in the case only two arguments.');
+                }
             },
             {
                 pattern: /dojo\.(toggle)Class/g,
