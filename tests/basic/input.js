@@ -53,6 +53,7 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         var x = new PTO.widget.ConstructorProperty();
         dijit.registry.someMethod();
         dijit.byId('id');
+        dojo.setSelectable({}, true);
         dijit.byNode('node');
         dojo.clone(new Sheep());
         dojo.contentBox('box');
@@ -109,6 +110,7 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
 
         dojo.isString('sdfsdf');
         dojo.isIE;
+        dojo.isWebKit;
         dojo._getBorderExtents();
         dojo.ready();
         dojo.body();
@@ -130,6 +132,12 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         });
 
         new dojo.Stateful();
+
+        dojo.getObject();
+
+        new dojo.store.Memory({data: {"id": "fake"}, idProperty: "id"});
+
+        dojo.deprecated("Don't use this!", "Use that!", "2.0");
     },
 
     templateString: 'something dojoAttachPoint="pinnedDataNodeCenter">/something' +

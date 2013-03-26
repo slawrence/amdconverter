@@ -76,6 +76,7 @@ this.CONVERTER = (function () {
             'dojo/_base/array': 'dojoArray',
             'dojo/io/iframe': 'dojoIframe',
             'dojo/_base/lang': 'dojoLang',
+            'dojo/_base/kernel': 'kernel',
             'dojo/keys': 'keys',
             'dojo/_base/event': 'dojoEvent',
             'dojo/dom-style': 'domStyle',
@@ -85,6 +86,7 @@ this.CONVERTER = (function () {
             'dojo/ready': 'ready',
             'dojo/has': 'has',
             'dojo/Stateful': 'Stateful',
+            'dojo/store/Memory': 'Memory',
             'dijit/registry': 'dijitRegistry',
             'dijit/popup': 'dijitPopup',
             'dijit/focus': 'dijitFocus',
@@ -129,12 +131,26 @@ this.CONVERTER = (function () {
                 depend: 'dojo/_base/lang'
             },
             {
+                pattern: /dojo\.(getObject)/g,
+                depend: 'dojo/_base/lang',
+                repFn: function (all) {
+                    warn('dojo.getObject relies on globals - refactor to make dojo.getObject unnecessary');
+                }
+            },
+            {
                 pattern: /dojo\.isIE/g,
                 depend: 'dojo/has',
                 repFn: function (all) {
                     warn('dojo.IsIE detected - replaced with has("ie"). Please double check the replacement for cases where a specific version of IE needed to be detected');
                     addDependency(this.depend, dependNameMap[this.depend]);
                     return "has('ie')";
+                }
+            },{
+                pattern: /dojo\.isWebKit/g,
+                depend: 'dojo/has',
+                repFn: function (all) {
+                    addDependency(this.depend, dependNameMap[this.depend]);
+                    return "has('webkit')";
                 }
             },
             {
@@ -149,8 +165,16 @@ this.CONVERTER = (function () {
                 depend: 'dojo/dom'
             },
             {
+                pattern: /dojo\.(setSelectable)/g,
+                depend: 'dojo/dom'
+            },
+            {
                 pattern: /dojo\.Stateful()/g,
                 depend: 'dojo/Stateful'
+            },
+            {
+                pattern: /dojo\.store\.Memory()/g,
+                depend: 'dojo/store/Memory'
             },
             {
                 pattern: /dojo\.html\.(set)/g,
@@ -174,7 +198,7 @@ this.CONVERTER = (function () {
                 depend: 'dojo/_base/declare',
                 alias: 'declare',
                 repFn: function (all) {
-                    //hacky work around specifically for declare, since we don't won't to replace it till the end
+                    //hacky work around specifically for declare, since we don't want to replace it until the end
                     addDependency(this.depend, this.alias);
                     return all;
                 }
@@ -211,6 +235,10 @@ this.CONVERTER = (function () {
             {
                 pattern: /dojo\.(hitch)/g,
                 depend: 'dojo/_base/lang'
+            },
+            {
+                pattern: /dojo\.(deprecated)/g,
+                depend: 'dojo/_base/kernel'
             },
             {
                 pattern: /dojo\.keys[\.]?([\w\.]*)/g,
@@ -425,7 +453,7 @@ this.CONVERTER = (function () {
                 pattern: /PTO\.log([\w\.]*)/g,
                 repFn: function (all, rest) {
                     this.alias = 'log' + rest;
-                    this.depend = 'plugin/ioc!' + toRelativePath('PTO.logging.Logger', currentPath);
+                    this.depend = 'plugins/ioc!' + toRelativePath('PTO.logging.Logger', currentPath);
                 }
             },
             {

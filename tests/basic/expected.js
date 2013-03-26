@@ -31,6 +31,7 @@ define([
     "dojo/Stateful",
     "dojo/_base/array",
     "dojo/_base/event",
+    "dojo/_base/kernel",
     "dojo/_base/lang",
     "dojo/_base/window",
     "dojo/cookie",
@@ -46,6 +47,7 @@ define([
     "dojo/keys",
     "dojo/query",
     "dojo/ready",
+    "dojo/store/Memory",
     "dojo/string",
     "plugin/ioc!../../logging/Logger"
 ], function (
@@ -78,6 +80,7 @@ define([
     Stateful,
     dojoArray,
     dojoEvent,
+    kernel,
     dojoLang,
     dojoWindow,
     cookie,
@@ -93,6 +96,7 @@ define([
     keys,
     dojoQuery,
     ready,
+    Memory,
     dojoString,
     log
 ) {
@@ -119,6 +123,7 @@ define([
             domClass.add('class');
             domAttr.attr('aria');
             dojoDom.byId('someId');
+            dojoDom.setSelectable({}, true);
             domConstruct.place('' + title + '', html);
             domConstruct.place('<span id="printCaseTitle" style="display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%;">' +
                     title + '</span>', html);
@@ -190,6 +195,7 @@ define([
 
             dojoLang.isString('sdfsdf');
             has('ie');
+            has('webkit');
             domGeom.getBorderExtents();
             ready();
             dojoWindow.body();
@@ -211,6 +217,12 @@ define([
             });
 
             new Stateful();
+
+            dojoLang.getObject();
+
+            new Memory({data: {"id": "fake"}, idProperty: "id"});
+
+            kernel.deprecated("Don't use this!", "Use that!", "2.0");
         },
 
         templateString: 'something data-dojo-attach-point="pinnedDataNodeCenter">/something' +
