@@ -134,7 +134,8 @@ this.CONVERTER = (function () {
                 pattern: /dojo\.(getObject)/g,
                 depend: 'dojo/_base/lang',
                 repFn: function (all) {
-                    warn('dojo.getObject relies on globals - refactor to make dojo.getObject unnecessary');
+                    warn('WARNING: All instances of dojo.getObject replaced with dojoLang.getObject. However, getObject ' + 
+                        'relies on globals - refactor to make dojo.getObject unnecessary');
                 }
             },
             {
