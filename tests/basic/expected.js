@@ -49,7 +49,7 @@ define([
     "dojo/ready",
     "dojo/store/Memory",
     "dojo/string",
-    "plugin/ioc!../../logging/Logger"
+    "plugins/ioc!../../logging/Logger"
 ], function (
     declare,
     Widget,
