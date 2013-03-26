@@ -425,7 +425,7 @@ this.CONVERTER = (function () {
                 pattern: /PTO\.log([\w\.]*)/g,
                 repFn: function (all, rest) {
                     this.alias = 'log' + rest;
-                    this.depend = 'plugin/ioc!' + toRelativePath('PTO.logging.Logger', currentPath);
+                    this.depend = 'plugins/ioc!' + toRelativePath('PTO.logging.Logger', currentPath);
                 }
             },
             {

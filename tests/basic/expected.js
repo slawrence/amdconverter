@@ -47,7 +47,7 @@ define([
     "dojo/query",
     "dojo/ready",
     "dojo/string",
-    "plugin/ioc!../../logging/Logger"
+    "plugins/ioc!../../logging/Logger"
 ], function (
     declare,
     Widget,
