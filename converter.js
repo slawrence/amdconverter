@@ -715,6 +715,16 @@ this.CONVERTER = (function () {
         });
     }
 
+    function normalizeLineEndings(string) {
+        return string.replace(/(?:\r\n|\r)+/g, "\n");
+    }
+
+    function eliminateWhiteSpace(string) {
+        return string.replace(/(\r\n|\n)\s+(\r\n|\n)/g, function (all, ln1, ln2) {
+            return ln1 + ln2;
+        });
+    }
+
     /**
      * We use the first argument of the declare signature to get the current "path"
      */
@@ -741,6 +751,8 @@ this.CONVERTER = (function () {
             reset();
             getCurrentPath(fileString, nsRoot);
             fileString = convertDeclare(replaceOldDojo(convertRequires(fileString, currentPath))).trim();
+            fileString = normalizeLineEndings(fileString);
+            fileString = eliminateWhiteSpace(fileString);
             this.warnings = warnings;
             //hacky workaround for declare, since we only want to replace it at the end
             return fileString.replace(/dojo\.declare/g, "declare");
