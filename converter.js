@@ -716,12 +716,12 @@ this.CONVERTER = (function () {
     }
 
     function normalizeLineEndings(string) {
-        return string.replace(/(?:\r\n|\r)+/g, "\n");
+        return string.replace(/(?:\r\n?|\n)+/g, "\n");
     }
 
     function eliminateWhiteSpace(string) {
-        return string.replace(/(\r\n|\n)\s+(\r\n|\n)/g, function (all, ln1, ln2) {
-            return ln1 + ln2;
+        return string.replace(/[^\S\r\n]+(\r\n?|\n)/g, function (all, ln) {
+            return ln;
         });
     }
 
