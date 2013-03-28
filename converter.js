@@ -277,7 +277,7 @@ this.CONVERTER = (function () {
                 depend: 'dojo/dom-construct'
             },
             {
-                pattern: /dojo\.query/g,
+                pattern: /dojo\.query()/g,
                 depend: 'dojo/query'
             },
             {
