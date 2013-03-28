@@ -83,6 +83,7 @@ this.CONVERTER = (function () {
             'dojo/_base/lang': 'dojoLang',
             'dojo/_base/kernel': 'kernel',
             'dojo/keys': 'keys',
+            'dojo/query': 'dojoQuery',
             'dojo/_base/event': 'dojoEvent',
             'dojo/dom-style': 'domStyle',
             'dojo/dom-geometry': 'domGeom',
@@ -166,6 +167,10 @@ this.CONVERTER = (function () {
                 repFn: function (all) {
                     warn('WARNING: Found a reference to dojo.attr: Because of the changes to dojo API you will have to manually find each instance and replace "attr" method with either get/set/has/etc. Also see dom-prop.');
                 }
+            },
+            {
+                pattern: /dojo\.(has)Attr/g,
+                depend: 'dojo/dom-attr'
             },
             {
                 pattern: /dojo\.(byId)/g,
@@ -273,7 +278,10 @@ this.CONVERTER = (function () {
             },
             {
                 pattern: /dojo\.query/g,
-                alias: 'dojoQuery',
+                depend: 'dojo/query'
+            },
+            {
+                pattern: /dojo\.(NodeList)/g,
                 depend: 'dojo/query'
             },
             {
@@ -715,6 +723,16 @@ this.CONVERTER = (function () {
         });
     }
 
+    function normalizeLineEndings(string) {
+        return string.replace(/(?:\r\n?|\n)+/g, "\n");
+    }
+
+    function eliminateWhiteSpace(string) {
+        return string.replace(/[^\S\r\n]+(\r\n?|\n)/g, function (all, ln) {
+            return ln;
+        });
+    }
+
     /**
      * We use the first argument of the declare signature to get the current "path"
      */
@@ -741,6 +759,8 @@ this.CONVERTER = (function () {
             reset();
             getCurrentPath(fileString, nsRoot);
             fileString = convertDeclare(replaceOldDojo(convertRequires(fileString, currentPath))).trim();
+            fileString = normalizeLineEndings(fileString);
+            fileString = eliminateWhiteSpace(fileString);
             this.warnings = warnings;
             //hacky workaround for declare, since we only want to replace it at the end
             return fileString.replace(/dojo\.declare/g, "declare");
