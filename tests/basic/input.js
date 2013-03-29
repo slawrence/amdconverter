@@ -37,6 +37,7 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         PTO.log.debug('This shouldnt be ignored');
         dojo.addClass('class');
         dojo.attr('aria');
+        dojo.hasAttr('data-some-attr');
         dojo.byId('someId');
         dojo.place('' + title + '', html);
         dojo.place('<span id="printCaseTitle" style="display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%;">' +
@@ -85,6 +86,7 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         dojo.toggleClass();
         dojo.removeClass();
         dojo.query('sdfsdf', dom);
+        dojo.NodeList();
         dijit.focus(domelement);
         dojo.trim('  sdfsdf   sdf  ');
         PTO.service.get('Employee');

@@ -122,6 +122,7 @@ define([
             log.debug('This shouldnt be ignored');
             domClass.add('class');
             domAttr.attr('aria');
+            domAttr.has('data-some-attr');
             dojoDom.byId('someId');
             dojoDom.setSelectable({}, true);
             domConstruct.place('' + title + '', html);
@@ -170,6 +171,7 @@ define([
             domClass.toggle();
             domClass.remove();
             dojoQuery('sdfsdf', dom);
+            dojoQuery.NodeList();
             dijitFocus.focus(domelement);
             dojoLang.trim('  sdfsdf   sdf  ');
             PTO.service.get('Employee');
