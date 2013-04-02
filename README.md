@@ -28,7 +28,9 @@ Change path to node folder inside each script before using. Probably a better wa
 * `convert file.js` will convert a single file
 * Use `-O` option to overwrite the file.
 
-## Add a test
+## Adding tests
+
+### Simple Test
 
 * Add test name to `testNames.json` in root dir
 
@@ -55,4 +57,24 @@ Change path to node folder inside each script before using. Probably a better wa
                     - input.js
                     - expected.js
 
+### Multiple Tests
 
+* Add the test to `testNames.json` as an object with a map that links an input file with an expected output file
+
+        {
+            tests: [
+                'basic',
+                {
+                    'name': 'declare', // <-- Added test
+                    'map' : [
+                        {
+                            'input' : 'input1', // Any name could be used
+                            'expected': 'expected1'
+                        }
+                    ]
+                }
+            ]
+        }
+
+* As above, create a folder in the tests folder corresponding to the name attribute in the object
+* Create input and expected files corresponding to the file names in the map

@@ -1,6 +1,18 @@
 {
     "tests": [
         "basic",
-        "url"
+        "url",
+        {
+            "name": "define",
+            "map": [
+                { "input": "input1", "expected": "expected1" },
+                { "input": "input2", "expected": "expected2" },
+                { "input": "input3", "expected": "expected3" },
+                { "input": "input4", "expected": "expected4" },
+                { "input": "input5", "expected": "expected5" },
+                { "input": "input6", "expected": "expected6" },
+                { "input": "input7", "expected": "expected7" }
+            ]
+        }
     ]
 }

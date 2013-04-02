@@ -107,15 +107,27 @@ function updateHeader() {
     }
 }
 
-function test(testDiv, name) {
+function test(testDiv, testItem) {
+    var isObj = typeof testItem === 'object',
+        name =  isObj ? testItem['name'] : testItem,
+        currentTest,
+        input = 'input',
+        expected = 'expected';
+
+    if (isObj) {
+        currentTest = testItem['map'].shift();
+        input = currentTest['input'];
+        expected = currentTest['expected'];
+    }
+
     $.ajax({
-        url: './tests/' + name + '/expected.js',
+        url: ['./tests/', name, '/', expected, '.js'].join(''),
         type: 'GET',
         cache: false,
         dataType: 'text',
         success: function (expected) {
             $.ajax({
-                url: './tests/' + name + '/input.js',
+                url: ['./tests/', name, '/', input, '.js'].join(''),
                 type: 'GET',
                 cache: false,
                 dataType: 'text', //don't execute
@@ -152,6 +164,10 @@ function test(testDiv, name) {
                     createOutput(div, name, run);
                     run.call(div, initial);
                     testDiv.append(div);
+
+                    if (isObj && testItem['map'].length) {
+                        test(testDiv, testItem);
+                    }
                 }
             });
         }
@@ -159,15 +175,14 @@ function test(testDiv, name) {
 }
 
 function runTests() {
-    $testDiv = $('#tests');
-    $testDiv.empty();
+    $testDiv = $('#tests').empty();
     $.ajax({
         type: 'GET',
         url: 'testNames.json',
         dataType: 'json',
         success: function (testNames) {
-            $.each(testNames.tests, function (i, name) {
-                test($testDiv, name);
+            $.each(testNames.tests, function (i, testItem) {
+                test($testDiv, testItem);
             })
         }
     });

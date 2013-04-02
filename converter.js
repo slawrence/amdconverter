@@ -717,6 +717,13 @@ this.CONVERTER = (function () {
             rest = rest.replace(/(\r\n?|\n)/g, function (all, match) {
                 return match + "    ";
             });
+
+            // remove array brackets from single mixin list
+            if (parents.split(',').length === 1) {
+                parents = parents.replace(/\[|\]/g, '');
+            }
+
+            console.log(parents);
             newDeclare = "declare('" + className + "', " + parents + rest;
             newDeclare = defineString(dependencies) + "    return " + newDeclare + "\n    });\n});";
             return newDeclare;
