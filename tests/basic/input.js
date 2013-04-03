@@ -52,6 +52,7 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         new dijit.widget.thingy.Form();
         PTO.dialog.CONSTANT = 5;
         var x = new PTO.widget.ConstructorProperty();
+        var xx = new PTO.widget.UIConstructorProperty();
         dijit.registry.someMethod();
         dijit.byId('id');
         dojo.setSelectable({}, true);

@@ -3,7 +3,7 @@
         "basic",
         "url",
         {
-            "name": "define",
+            "name": "declare",
             "map": [
                 { "input": "input1", "expected": "expected1" },
                 { "input": "input2", "expected": "expected2" },

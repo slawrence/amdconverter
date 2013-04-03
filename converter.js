@@ -478,7 +478,7 @@ this.CONVERTER = (function () {
                     }
 
                     //Is the match a constructor?
-                    if (last.match(/^[A-Z][a-z_\$][\w]*/)) {
+                    if (last.match(/^[A-Z]+[a-z_\$][\w]*/)) {
                         this.alias = last;
                         this.depend = toRelativePath(all, currentPath);
                     } else {
@@ -723,7 +723,6 @@ this.CONVERTER = (function () {
                 parents = parents.replace(/\[|\]/g, '');
             }
 
-            console.log(parents);
             newDeclare = "declare('" + className + "', " + parents + rest;
             newDeclare = defineString(dependencies) + "    return " + newDeclare + "\n    });\n});";
             return newDeclare;

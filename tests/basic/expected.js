@@ -17,6 +17,7 @@ define([
     "../../something/Thing",
     "../../thing/config",
     "../ConstructorProperty",
+    "../UIConstructorProperty",
     "../document",
     "./Something",
     "./something",
@@ -66,6 +67,7 @@ define([
     Thing,
     config,
     ConstructorProperty,
+    UIConstructorProperty,
     document,
     Something,
     something,
@@ -138,6 +140,7 @@ define([
             new dijitForm();
             dialogConstants.CONSTANT = 5;
             var x = new ConstructorProperty();
+            var xx = new UIConstructorProperty();
             dijitRegistry.someMethod();
             dijitRegistry.byId('id');
             dijitRegistry.byNode('node');
