@@ -91,6 +91,7 @@ this.CONVERTER = (function () {
             'dojo/string': 'dojoString',
             'dojo/ready': 'ready',
             'dojo/has': 'has',
+            'dojo/fx': 'dojoFx',
             'dojo/Stateful': 'Stateful',
             'dojo/store/Memory': 'Memory',
             'dijit/registry': 'dijitRegistry',
@@ -384,6 +385,13 @@ this.CONVERTER = (function () {
             {
                 pattern: /dojo\.(position)/g,
                 depend: 'dojo/dom-geometry'
+            },
+            {
+                pattern: /dojo\.fx\.([\w\.]*)/g,
+                depend: 'dojo/fx',
+                repFn: function (all) {
+                    warnOnce('WARNING - All dojo.fx.<methodName> replaced with dojoFx.<methodName>. Ensure method names have not changed in 1.8.');
+                }
             },
             {
                 pattern: /dijit\.(getEnclosingWidget)/g,

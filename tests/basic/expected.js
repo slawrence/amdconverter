@@ -42,6 +42,7 @@ define([
     "dojo/dom-construct",
     "dojo/dom-geometry",
     "dojo/dom-style",
+    "dojo/fx",
     "dojo/has",
     "dojo/html",
     "dojo/io/iframe",
@@ -92,6 +93,7 @@ define([
     domConstruct,
     domGeom,
     domStyle,
+    dojoFx,
     has,
     dojoHtml,
     dojoIframe,
@@ -220,6 +222,8 @@ define([
             DijitTooltip({
                 config: {}
             });
+            dojoFx.slideIn();
+            dojoFx.slideOut();
 
             new Stateful();
 

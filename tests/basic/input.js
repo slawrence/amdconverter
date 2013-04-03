@@ -133,6 +133,8 @@ dojo.declare('PTO.widget.document.DocumentViewerLoader', [PTO.something.Thing, P
         dijit.Tooltip({
             config: {}
         });
+        dojo.fx.slideIn();
+        dojo.fx.slideOut();
 
         new dojo.Stateful();
 
