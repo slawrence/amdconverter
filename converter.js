@@ -729,7 +729,7 @@ this.CONVERTER = (function () {
             // remove array brackets from single mixin list
             if (parents.split(',').length === 1) {
                 parents = parents.replace(/\[([\S\s]*)\]/g, function (all, rest) {
-                    return rest || 'null';
+                    return rest.trim() ? rest : 'null';
                 });
             }
 

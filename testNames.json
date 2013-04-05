@@ -12,7 +12,8 @@
                 { "input": "input5", "expected": "expected5" },
                 { "input": "input6", "expected": "expected6" },
                 { "input": "input7", "expected": "expected7" },
-                { "input": "input8", "expected": "expected8" }
+                { "input": "input8", "expected": "expected8" },
+                { "input": "input9", "expected": "expected9" }
             ]
         }
     ]
