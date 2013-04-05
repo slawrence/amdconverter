@@ -728,7 +728,9 @@ this.CONVERTER = (function () {
 
             // remove array brackets from single mixin list
             if (parents.split(',').length === 1) {
-                parents = parents.replace(/\[|\]/g, '');
+                parents = parents.replace(/\[([\S\s]*)\]/g, function (all, rest) {
+                    return rest || 'null';
+                });
             }
 
             newDeclare = "declare('" + className + "', " + parents + rest;
